@@ -21,6 +21,13 @@ export interface Company {
   email: string;
   telephone: string;
   siret: string;
+  smtp_type?: string;
+  smtp_host?: string;
+  smtp_port?: number;
+  smtp_user?: string;
+  smtp_pass?: string;
+  email_subject?: string;
+  email_message?: string;
 }
 
 export enum InvoiceStatus {

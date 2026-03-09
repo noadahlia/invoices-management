@@ -3,12 +3,13 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, FileText, Plus, MoreHorizontal, Pencil, Trash2, Download } from 'lucide-react';
+import { ArrowLeft, FileText, Plus, MoreHorizontal, Pencil, Trash2, Download, Mail } from 'lucide-react';
 import { DropdownMenu } from 'radix-ui';
 import { supabase } from '@/src/lib/supabase';
 import { InvoiceStatus } from '@/src/types';
 import type { Invoice } from '@/src/types';
 import { downloadInvoicePdf } from '@/src/lib/download-pdf';
+import { sendInvoiceEmail } from '@/app/actions/send-invoice-email';
 
 const STATUS_CONFIG: Record<InvoiceStatus, { label: string; className: string }> = {
   [InvoiceStatus.DRAFT]: { label: 'Non payée', className: 'bg-gray-100 text-gray-600 ring-1 ring-gray-200'          },
@@ -22,6 +23,7 @@ export default function InvoicesPage() {
   const [loading, setLoading]             = useState(true);
   const [updatingId, setUpdatingId]       = useState<string | null>(null);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [sendingEmailId, setSendingEmailId] = useState<string | null>(null);
 
   useEffect(() => {
     supabase
@@ -51,6 +53,22 @@ export default function InvoicesPage() {
     if (!confirm('Supprimer cette facture ? Cette action est irréversible.')) return;
     const { error } = await supabase.from('invoices').delete().eq('id', invoiceId);
     if (!error) setInvoices(prev => prev.filter(inv => inv.id !== invoiceId));
+  };
+
+  const handleSendEmail = async (invoiceId: string) => {
+    setSendingEmailId(invoiceId);
+    try {
+      const result = await sendInvoiceEmail(invoiceId);
+      if (result.success) {
+        alert('Email envoyé avec succès!');
+      } else {
+        alert(`Erreur: ${result.error}`);
+      }
+    } catch (err) {
+      alert(`Erreur lors de l'envoi: ${err instanceof Error ? err.message : 'Erreur inconnue'}`);
+    } finally {
+      setSendingEmailId(null);
+    }
   };
 
   return (
@@ -175,10 +193,18 @@ export default function InvoicesPage() {
                               <DropdownMenu.Item
                                 onSelect={() => handleDownload(invoice.id, invoice.invoice_number)}
                                 disabled={downloadingId === invoice.id}
-                                className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 outline-none transition-colors"
+                                className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 outline-none transition-colors disabled:opacity-50"
                               >
                                 <Download className="w-3.5 h-3.5 text-gray-400" />
                                 {downloadingId === invoice.id ? 'Génération...' : 'Télécharger PDF'}
+                              </DropdownMenu.Item>
+                              <DropdownMenu.Item
+                                onSelect={() => handleSendEmail(invoice.id)}
+                                disabled={sendingEmailId === invoice.id}
+                                className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 outline-none transition-colors disabled:opacity-50"
+                              >
+                                <Mail className="w-3.5 h-3.5 text-gray-400" />
+                                {sendingEmailId === invoice.id ? 'Envoi...' : 'Envoyer par mail'}
                               </DropdownMenu.Item>
                               <DropdownMenu.Separator className="my-1.5 h-px bg-gray-100" />
                               <DropdownMenu.Item

@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Building2 } from 'lucide-react';
+import { ArrowLeft, Building2, Mail } from 'lucide-react';
 import { supabase } from '@/src/lib/supabase';
 import type { Company } from '@/src/types';
 import EditCompanyModal from '@/src/components/EditCompanyModal';
+import SmtpSettingsModal from '@/src/components/SmtpSettingsModal';
 
 export default function CompanyPage() {
   const [company, setCompany] = useState<Company | null>(null);
@@ -48,7 +49,7 @@ export default function CompanyPage() {
           <EditCompanyModal company={company} onCompanySaved={fetchCompany} />
         </div>
 
-        {/* Card */}
+        {/* Company Card */}
         <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
           {loading ? (
             <div className="flex items-center justify-center py-20 text-gray-400 text-sm">
@@ -96,6 +97,51 @@ export default function CompanyPage() {
             </div>
           )}
         </div>
+
+        {/* Email Configuration Card */}
+        {company && (
+          <div className="mt-6 rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+            <div className="p-8 space-y-6">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+                    <Mail className="w-4 h-4" />
+                  </div>
+                  <h2 className="text-base font-bold text-gray-900">Configuration email</h2>
+                </div>
+                <SmtpSettingsModal company={company} onSettingsSaved={fetchCompany} />
+              </div>
+
+              {company.smtp_user ? (
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between items-start">
+                    <span className="text-gray-500">Provider:</span>
+                    <span className="font-medium text-gray-900">
+                      {company.smtp_type === 'gmail' ? 'Gmail' : company.smtp_type === 'outlook' ? 'Outlook' : 'SMTP personnalisé'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-start">
+                    <span className="text-gray-500">Email SMTP:</span>
+                    <span className="font-medium text-gray-900">{company.smtp_user}</span>
+                  </div>
+                  <div className="flex justify-between items-start">
+                    <span className="text-gray-500">Serveur:</span>
+                    <span className="font-medium text-gray-900">{company.smtp_host}:{company.smtp_port}</span>
+                  </div>
+                  <div className="border-t border-gray-100 pt-3 mt-3">
+                    <p className="text-xs text-gray-500 mb-1">Objet des emails:</p>
+                    <p className="text-sm text-gray-700">{company.email_subject}</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8 gap-3">
+                  <p className="text-sm text-gray-500">Aucune configuration email</p>
+                  <p className="text-xs text-gray-400">Cliquez sur &quot;Modifier email&quot; pour configurer l'envoi de factures par email.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
