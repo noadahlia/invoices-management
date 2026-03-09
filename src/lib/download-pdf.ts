@@ -1,7 +1,23 @@
 import { generateInvoicePdf } from '@/app/actions/generate-pdf';
 
-export async function downloadInvoicePdf(invoiceId: string, invoiceNumber: string) {
-  const base64 = await generateInvoicePdf(invoiceId);
+interface DownloadResult {
+  success: boolean;
+  error?: string;
+  errorType?: 'company_not_found' | 'invoice_not_found' | 'database_error' | 'unknown';
+}
+
+export async function downloadInvoicePdf(invoiceId: string, invoiceNumber: string): Promise<DownloadResult> {
+  const result = await generateInvoicePdf(invoiceId);
+
+  if (!result.success) {
+    return {
+      success: false,
+      error: result.error,
+      errorType: result.errorType,
+    };
+  }
+
+  const base64 = result.data!;
 
   const binary = atob(base64);
   const bytes = new Uint8Array(binary.length);
@@ -18,4 +34,6 @@ export async function downloadInvoicePdf(invoiceId: string, invoiceNumber: strin
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+
+  return { success: true };
 }

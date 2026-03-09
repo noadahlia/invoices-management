@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Building2, Mail } from 'lucide-react';
-import { supabase } from '@/src/lib/supabase';
+import { getCompany } from '@/app/actions/company';
 import type { Company } from '@/src/types';
 import EditCompanyModal from '@/src/components/EditCompanyModal';
 import SmtpSettingsModal from '@/src/components/SmtpSettingsModal';
@@ -14,15 +14,20 @@ export default function CompanyPage() {
 
   const fetchCompany = async () => {
     setLoading(true);
-    const { data } = await supabase.from('companies').select('*').limit(1).single();
-    setCompany(data ?? null);
-    setLoading(false);
+    try {
+      const data = await getCompany();
+      setCompany(data ?? null);
+    } catch (err) {
+      setCompany(null);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { fetchCompany(); }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="p-8">
       <div className="mx-auto max-w-2xl">
 
         {/* Header */}

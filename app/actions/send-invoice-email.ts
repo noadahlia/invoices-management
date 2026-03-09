@@ -1,30 +1,30 @@
 'use server';
 
 import nodemailer from 'nodemailer';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseServerClient } from '@/src/lib/server-auth';
 import { generateInvoicePdf } from './generate-pdf';
-
-function getSupabase() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  );
-}
 
 interface SendEmailResult {
   success: boolean;
   error?: string;
+  errorType?: 'company_not_found' | 'smtp_incomplete' | 'client_email_missing' | 'unknown';
 }
 
 export async function sendInvoiceEmail(invoiceId: string): Promise<SendEmailResult> {
   try {
-    const supabase = getSupabase();
+    const supabase = await getSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    // Get invoice with client info
+    if (!user) {
+      return { success: false, error: 'Non authentifié' };
+    }
+
+    // Get invoice with client info (filtered by user_id)
     const { data: invoice, error: invoiceError } = await supabase
       .from('invoices')
       .select('*, clients(*)')
       .eq('id', invoiceId)
+      .eq('user_id', user.id)
       .single();
 
     if (invoiceError || !invoice) {
@@ -32,32 +32,35 @@ export async function sendInvoiceEmail(invoiceId: string): Promise<SendEmailResu
     }
 
     if (!invoice.clients || !invoice.clients.email) {
-      return { success: false, error: 'Email du client non trouvé' };
+      return { success: false, error: 'Email du client non configuré. Veuillez ajouter un email au client.', errorType: 'client_email_missing' };
     }
 
-    // Get company SMTP settings
+    // Get company SMTP settings (filtered by user_id)
     const { data: company, error: companyError } = await supabase
       .from('companies')
       .select('*')
+      .eq('user_id', user.id)
       .limit(1)
       .single();
 
     if (companyError || !company) {
-      return { success: false, error: 'Configuration de l\'entreprise non trouvée' };
+      if (companyError && companyError.code !== 'PGRST116') {
+        return { success: false, error: companyError.message, errorType: 'unknown' };
+      }
+      return { success: false, error: 'Votre entreprise n\'est pas configurée.', errorType: 'company_not_found' };
     }
 
     // Validate SMTP configuration
     if (!company.smtp_host || !company.smtp_port || !company.smtp_user || !company.smtp_pass) {
-      return { success: false, error: 'Configuration SMTP incomplète. Veuillez configurer les paramètres email.' };
+      return { success: false, error: 'Configuration email incomplète.', errorType: 'smtp_incomplete' };
     }
 
     // Generate PDF
-    let pdfBase64: string;
-    try {
-      pdfBase64 = await generateInvoicePdf(invoiceId);
-    } catch (err) {
-      return { success: false, error: `Erreur lors de la génération du PDF: ${err instanceof Error ? err.message : 'Erreur inconnue'}` };
+    const pdfResult = await generateInvoicePdf(invoiceId);
+    if (!pdfResult.success) {
+      return { success: false, error: `Erreur lors de la génération du PDF: ${pdfResult.error}`, errorType: 'unknown' };
     }
+    const pdfBase64 = pdfResult.data!;
 
     // Create transporter
     const transporter = nodemailer.createTransport({

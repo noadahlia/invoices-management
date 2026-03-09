@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Dialog } from 'radix-ui';
 import { X, UserPlus } from 'lucide-react';
-import { supabase } from '@/src/lib/supabase';
+import { addClient } from '@/app/actions/clients';
 import MessageModal, { type MessageType } from './ErrorModal';
 
 interface Props { onClientAdded: () => void; }
@@ -34,10 +34,17 @@ export default function AddClientModal({ onClientAdded }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error: err } = await supabase.from('clients').insert([form]);
-    setLoading(false);
-    if (err) { setMessage({ type: 'error', text: err.message }); return; }
-    setForm(EMPTY_FORM); setOpen(false); setMessage({ type: 'success', text: 'Client ajouté avec succès' }); onClientAdded();
+    try {
+      await addClient(form);
+      setForm(EMPTY_FORM);
+      setOpen(false);
+      setMessage({ type: 'success', text: 'Client ajouté avec succès' });
+      onClientAdded();
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Une erreur est survenue' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Users, MoreHorizontal, Pencil } from 'lucide-react';
 import { DropdownMenu } from 'radix-ui';
-import { supabase } from '@/src/lib/supabase';
+import { getClients } from '@/app/actions/clients';
 import type { Client } from '@/src/types';
 import AddClientModal from '@/src/components/AddClientModal';
 import EditClientModal from '@/src/components/EditClientModal';
@@ -26,9 +26,21 @@ export default function ClientsPage() {
 
   const fetchClients = async () => {
     setLoading(true);
-    const { data } = await supabase.from('clients').select('*').order('nom');
-    setClients(data ?? []);
-    setLoading(false);
+    try {
+      const data = await getClients();
+      setClients(data ?? []);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Une erreur est survenue';
+      // Si c'est une erreur d'authentification, ne pas afficher de modal
+      if (!errorMsg.includes('Unauthorized')) {
+        setMessage({
+          type: 'error',
+          text: errorMsg
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { fetchClients(); }, []);
@@ -36,7 +48,7 @@ export default function ClientsPage() {
   const editingClient = clients.find(c => c.id === editingId);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="p-8">
       <div className="mx-auto max-w-6xl">
 
         {/* Header */}

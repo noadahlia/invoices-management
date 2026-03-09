@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, FileText } from 'lucide-react';
 import { supabase } from '@/src/lib/supabase';
+import { createInvoiceWithItems } from '@/app/actions/invoices';
 import { InvoiceStatus } from '@/src/types';
 import type { Client, Service } from '@/src/types';
 import ClientSelector from '@/src/components/ClientSelector';
@@ -74,45 +75,26 @@ export default function NewInvoicePage() {
     setSaving(true);
     setError(null);
 
-    // 1. Create invoice
-    const { data: invoice, error: invoiceError } = await supabase
-      .from('invoices')
-      .insert({
-        client_id:      clientId,
+    try {
+      await createInvoiceWithItems({
+        client_id: clientId,
         invoice_number: generateInvoiceNumber(),
-        total_amount:   totalAmount,
-        status:         InvoiceStatus.DRAFT,
-      })
-      .select()
-      .single();
-
-    if (invoiceError || !invoice) {
-      setError(invoiceError?.message ?? 'Erreur lors de la création de la facture.');
+        total_amount: totalAmount,
+        status: InvoiceStatus.DRAFT,
+        items: summaryLines.map(line => {
+          const service = services.find(s => s.description === line.description);
+          return {
+            service_id: service?.id || '',
+            quantity: line.quantity,
+            unit_price_snapshot: line.unit_price,
+          };
+        }),
+      });
+      router.push('/invoices');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur lors de la création de la facture.');
       setSaving(false);
-      return;
     }
-
-    // 2. Create invoice items
-    const items = services
-      .filter(s => (quantities[s.id] ?? 0) > 0)
-      .map(s => ({
-        invoice_id:          invoice.id,
-        service_id:          s.id,
-        quantity:            quantities[s.id],
-        unit_price_snapshot: s.prix_unitaire,
-      }));
-
-    const { error: itemsError } = await supabase
-      .from('invoice_items')
-      .insert(items);
-
-    setSaving(false);
-    if (itemsError) {
-      setError(itemsError.message);
-      return;
-    }
-
-    router.push('/invoices');
   };
 
   return (

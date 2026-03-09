@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Dialog } from 'radix-ui';
 import { X, Building2 } from 'lucide-react';
-import { supabase } from '@/src/lib/supabase';
+import { updateCompany } from '@/app/actions/company';
 import type { Company } from '@/src/types';
 
 interface Props { company: Company | null; onCompanySaved: () => void; }
@@ -47,18 +47,17 @@ export default function EditCompanyModal({ company, onCompanySaved }: Props) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true); setError(null);
-
-    if (company) {
-      const { error: err } = await supabase.from('companies').update(form).eq('id', company.id);
+    setLoading(true);
+    setError(null);
+    try {
+      await updateCompany(form);
+      setOpen(false);
+      onCompanySaved();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Une erreur est survenue');
+    } finally {
       setLoading(false);
-      if (err) { setError(err.message); return; }
-    } else {
-      const { error: err } = await supabase.from('companies').insert([form]);
-      setLoading(false);
-      if (err) { setError(err.message); return; }
     }
-    setOpen(false); onCompanySaved();
   };
 
   return (

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Dialog } from 'radix-ui';
 import { X, Mail, Info } from 'lucide-react';
-import { supabase } from '@/src/lib/supabase';
+import { updateCompany } from '@/app/actions/company';
 import type { Company } from '@/src/types';
 
 interface Props { company: Company | null; onSettingsSaved: () => void; }
@@ -90,26 +90,23 @@ export default function SmtpSettingsModal({ company, onSettingsSaved }: Props) {
       return;
     }
 
-    const { error: err } = await supabase
-      .from('companies')
-      .update({
+    try {
+      await updateCompany({
         smtp_type: form.smtp_type,
         smtp_host: form.smtp_host,
-        smtp_port: form.smtp_port,
+        smtp_port: form.smtp_port === '' ? undefined : form.smtp_port,
         smtp_user: form.smtp_user,
         smtp_pass: form.smtp_pass,
         email_subject: form.email_subject,
         email_message: form.email_message,
-      })
-      .eq('id', company.id);
-
-    setLoading(false);
-    if (err) {
-      setError(err.message);
-      return;
+      });
+      setOpen(false);
+      onSettingsSaved();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Une erreur est survenue');
+    } finally {
+      setLoading(false);
     }
-    setOpen(false);
-    onSettingsSaved();
   };
 
   return (

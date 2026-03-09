@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Dialog } from 'radix-ui';
 import { X, UserCog } from 'lucide-react';
-import { supabase } from '@/src/lib/supabase';
+import { updateClient } from '@/app/actions/clients';
 import type { Client } from '@/src/types';
 import MessageModal, { type MessageType } from './ErrorModal';
 
@@ -44,10 +44,16 @@ export default function EditClientModal({ client, onClientUpdated, open, onOpenC
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error: err } = await supabase.from('clients').update(form).eq('id', client.id);
-    setLoading(false);
-    if (err) { setMessage({ type: 'error', text: err.message }); return; }
-    onOpenChange(false); setMessage({ type: 'success', text: 'Client modifié avec succès' }); onClientUpdated();
+    try {
+      await updateClient(client.id, form);
+      onOpenChange(false);
+      setMessage({ type: 'success', text: 'Client modifié avec succès' });
+      onClientUpdated();
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Une erreur est survenue' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

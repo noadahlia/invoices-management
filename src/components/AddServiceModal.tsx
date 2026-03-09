@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Dialog } from 'radix-ui';
 import { X, Plus } from 'lucide-react';
-import { supabase } from '@/src/lib/supabase';
+import { addService } from '@/app/actions/services';
 
 interface Props { onServiceAdded: () => void; }
 
@@ -22,14 +22,21 @@ export default function AddServiceModal({ onServiceAdded }: Props) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true); setError(null);
-    const { error: err } = await supabase.from('services').insert([{
-      description:   form.description,
-      prix_unitaire: parseFloat(form.prix_unitaire),
-    }]);
-    setLoading(false);
-    if (err) { setError(err.message); return; }
-    setForm(EMPTY_FORM); setOpen(false); onServiceAdded();
+    setLoading(true);
+    setError(null);
+    try {
+      await addService({
+        description: form.description,
+        prix_unitaire: parseFloat(form.prix_unitaire),
+      });
+      setForm(EMPTY_FORM);
+      setOpen(false);
+      onServiceAdded();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Une erreur est survenue');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

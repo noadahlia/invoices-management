@@ -26,7 +26,7 @@ export default function InvoicesPage() {
   const [updatingId, setUpdatingId]       = useState<string | null>(null);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [sendingEmailId, setSendingEmailId] = useState<string | null>(null);
-  const [message, setMessage] = useState<{ type: MessageType; text: string } | null>(null);
+  const [message, setMessage] = useState<{ type: MessageType; text: string; errorType?: string } | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
 
   useEffect(() => {
@@ -49,8 +49,19 @@ export default function InvoicesPage() {
 
   const handleDownload = async (invoiceId: string, invoiceNumber: string) => {
     setDownloadingId(invoiceId);
-    try { await downloadInvoicePdf(invoiceId, invoiceNumber); }
-    finally { setDownloadingId(null); }
+    try {
+      const result = await downloadInvoicePdf(invoiceId, invoiceNumber);
+      if (!result.success) {
+        const messageType = result.errorType === 'company_not_found' ? 'warning' : 'error';
+        setMessage({ type: messageType as MessageType, text: result.error || 'Erreur inconnue', errorType: result.errorType });
+      } else {
+        setMessage({ type: 'success', text: 'PDF généré avec succès!' });
+      }
+    } catch (err) {
+      setMessage({ type: 'error', text: `Erreur lors de la génération du PDF: ${err instanceof Error ? err.message : 'Erreur inconnue'}` });
+    } finally {
+      setDownloadingId(null);
+    }
   };
 
   const handleDelete = async (invoiceId: string) => {
@@ -72,7 +83,8 @@ export default function InvoicesPage() {
         setInvoices(prev => prev.map(inv => inv.id === invoiceId ? { ...inv, status: InvoiceStatus.SENT } : inv));
         setMessage({ type: 'success', text: 'Email envoyé avec succès!' });
       } else {
-        setMessage({ type: 'error', text: `Erreur: ${result.error}` });
+        const messageType = (result.errorType === 'company_not_found' || result.errorType === 'smtp_incomplete') ? 'warning' : 'error';
+        setMessage({ type: messageType as MessageType, text: result.error || 'Erreur inconnue', errorType: result.errorType });
       }
     } catch (err) {
       setMessage({ type: 'error', text: `Erreur lors de l'envoi: ${err instanceof Error ? err.message : 'Erreur inconnue'}` });
@@ -250,6 +262,16 @@ export default function InvoicesPage() {
         onOpenChange={(open) => !open && setMessage(null)}
         type={message?.type}
         message={message?.text || ''}
+        actionLabel={
+          message?.errorType === 'company_not_found' || message?.errorType === 'smtp_incomplete'
+            ? 'Configurer'
+            : undefined
+        }
+        onAction={
+          message?.errorType === 'company_not_found' || message?.errorType === 'smtp_incomplete'
+            ? () => router.push('/company')
+            : undefined
+        }
       />
 
       <ConfirmModal

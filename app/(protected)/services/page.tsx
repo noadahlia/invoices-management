@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Briefcase } from 'lucide-react';
-import { supabase } from '@/src/lib/supabase';
+import { getServices } from '@/app/actions/services';
 import type { Service } from '@/src/types';
 import AddServiceModal from '@/src/components/AddServiceModal';
 
@@ -13,15 +13,20 @@ export default function ServicesPage() {
 
   const fetchServices = async () => {
     setLoading(true);
-    const { data } = await supabase.from('services').select('*').order('description');
-    setServices(data ?? []);
-    setLoading(false);
+    try {
+      const data = await getServices();
+      setServices(data ?? []);
+    } catch (err) {
+      setServices([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { fetchServices(); }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="p-8">
       <div className="mx-auto max-w-3xl">
 
         {/* Header */}

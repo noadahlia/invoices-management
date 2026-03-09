@@ -3,7 +3,7 @@
 import { Dialog } from 'radix-ui';
 import { X, AlertCircle, CheckCircle, Info } from 'lucide-react';
 
-export type MessageType = 'error' | 'success' | 'info';
+export type MessageType = 'error' | 'success' | 'info' | 'warning';
 
 interface Props {
   open: boolean;
@@ -11,6 +11,8 @@ interface Props {
   type?: MessageType;
   title?: string;
   message: string;
+  actionLabel?: string;
+  onAction?: () => void;
 }
 
 const CONFIG: Record<MessageType, { icon: React.ReactNode; bgColor: string; gradientColor: string; buttonColor: string; titleColor: string }> = {
@@ -35,17 +37,32 @@ const CONFIG: Record<MessageType, { icon: React.ReactNode; bgColor: string; grad
     buttonColor: 'bg-blue-600 hover:bg-blue-700',
     titleColor: 'text-blue-600',
   },
+  warning: {
+    icon: <AlertCircle className="w-4 h-4" />,
+    bgColor: 'bg-amber-50',
+    gradientColor: 'from-amber-500 to-amber-600',
+    buttonColor: 'bg-amber-600 hover:bg-amber-700',
+    titleColor: 'text-amber-600',
+  },
 };
 
 const TITLES: Record<MessageType, string> = {
   error: 'Erreur',
   success: 'Succès',
   info: 'Information',
+  warning: 'Attention',
 };
 
-export default function MessageModal({ open, onOpenChange, type = 'info', title, message }: Props) {
+export default function MessageModal({ open, onOpenChange, type = 'info', title, message, actionLabel, onAction }: Props) {
   const config = CONFIG[type];
   const displayTitle = title || TITLES[type];
+
+  const handleAction = () => {
+    if (onAction) {
+      onAction();
+    }
+    onOpenChange(false);
+  };
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -68,12 +85,22 @@ export default function MessageModal({ open, onOpenChange, type = 'info', title,
 
             <p className="text-sm text-gray-600 mb-6">{message}</p>
 
-            <button
-              onClick={() => onOpenChange(false)}
-              className={`w-full rounded-xl py-2.5 text-sm font-semibold text-white ${config.buttonColor} transition-colors`}
-            >
-              Fermer
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={() => onOpenChange(false)}
+                className="flex-1 rounded-xl py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+              >
+                Fermer
+              </button>
+              {onAction && actionLabel && (
+                <button
+                  onClick={handleAction}
+                  className={`flex-1 rounded-xl py-2.5 text-sm font-semibold text-white ${config.buttonColor} transition-colors`}
+                >
+                  {actionLabel}
+                </button>
+              )}
+            </div>
           </div>
         </Dialog.Content>
       </Dialog.Portal>
