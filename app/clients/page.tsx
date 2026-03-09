@@ -2,10 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Users } from 'lucide-react';
+import { ArrowLeft, Users, MoreHorizontal, Pencil } from 'lucide-react';
+import { DropdownMenu } from 'radix-ui';
 import { supabase } from '@/src/lib/supabase';
 import type { Client } from '@/src/types';
 import AddClientModal from '@/src/components/AddClientModal';
+import EditClientModal from '@/src/components/EditClientModal';
+import MessageModal, { type MessageType } from '@/src/components/ErrorModal';
 
 const COLUMNS: { key: keyof Client; label: string }[] = [
   { key: 'nom',       label: 'Nom'       },
@@ -18,6 +21,8 @@ const COLUMNS: { key: keyof Client; label: string }[] = [
 export default function ClientsPage() {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ type: MessageType; text: string } | null>(null);
 
   const fetchClients = async () => {
     setLoading(true);
@@ -27,6 +32,8 @@ export default function ClientsPage() {
   };
 
   useEffect(() => { fetchClients(); }, []);
+
+  const editingClient = clients.find(c => c.id === editingId);
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
@@ -79,16 +86,41 @@ export default function ClientsPage() {
                       {label}
                     </th>
                   ))}
+                  <th className="px-6 py-3.5 text-left text-xs font-bold text-gray-400 uppercase tracking-widest"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {clients.map(client => (
-                  <tr key={client.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={client.id} onClick={() => setEditingId(client.id)} className="hover:bg-gray-50 transition-colors cursor-pointer">
                     <td className="px-6 py-4 font-semibold text-gray-900">{client.nom}</td>
                     <td className="px-6 py-4 text-gray-700">{client.prenom}</td>
                     <td className="px-6 py-4 text-gray-500">{client.email}</td>
                     <td className="px-6 py-4 text-gray-500 tabular-nums">{client.telephone}</td>
                     <td className="px-6 py-4 text-gray-500">{client.adresse}</td>
+                    <td className="px-4 py-4" onClick={e => e.stopPropagation()}>
+                      <DropdownMenu.Root>
+                        <DropdownMenu.Trigger asChild>
+                          <button className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors focus:outline-none">
+                            <MoreHorizontal className="w-4 h-4" />
+                          </button>
+                        </DropdownMenu.Trigger>
+                        <DropdownMenu.Portal>
+                          <DropdownMenu.Content
+                            align="end"
+                            sideOffset={4}
+                            className="z-50 min-w-[170px] rounded-xl border border-gray-200 bg-white p-1.5 shadow-lg animate-in fade-in-0 zoom-in-95"
+                          >
+                            <DropdownMenu.Item
+                              onSelect={() => setEditingId(client.id)}
+                              className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 outline-none transition-colors"
+                            >
+                              <Pencil className="w-3.5 h-3.5 text-gray-400" />
+                              Modifier
+                            </DropdownMenu.Item>
+                          </DropdownMenu.Content>
+                        </DropdownMenu.Portal>
+                      </DropdownMenu.Root>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -96,6 +128,22 @@ export default function ClientsPage() {
           )}
         </div>
       </div>
+
+      {editingClient && (
+        <EditClientModal
+          client={editingClient}
+          onClientUpdated={fetchClients}
+          open={true}
+          onOpenChange={(open) => !open && setEditingId(null)}
+        />
+      )}
+
+      <MessageModal
+        open={message !== null}
+        onOpenChange={(open) => !open && setMessage(null)}
+        type={message?.type}
+        message={message?.text || ''}
+      />
     </div>
   );
 }

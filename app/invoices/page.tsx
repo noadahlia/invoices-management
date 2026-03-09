@@ -3,13 +3,15 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, FileText, Plus, MoreHorizontal, Pencil, Trash2, Download, Mail } from 'lucide-react';
+import { ArrowLeft, FileText, Plus, MoreHorizontal, Pencil, Trash2, Download, Mail, Loader2 } from 'lucide-react';
 import { DropdownMenu } from 'radix-ui';
 import { supabase } from '@/src/lib/supabase';
 import { InvoiceStatus } from '@/src/types';
 import type { Invoice } from '@/src/types';
 import { downloadInvoicePdf } from '@/src/lib/download-pdf';
 import { sendInvoiceEmail } from '@/app/actions/send-invoice-email';
+import MessageModal, { type MessageType } from '@/src/components/ErrorModal';
+import ConfirmModal from '@/src/components/ConfirmModal';
 
 const STATUS_CONFIG: Record<InvoiceStatus, { label: string; className: string }> = {
   [InvoiceStatus.DRAFT]: { label: 'Non payée', className: 'bg-gray-100 text-gray-600 ring-1 ring-gray-200'          },
@@ -24,6 +26,8 @@ export default function InvoicesPage() {
   const [updatingId, setUpdatingId]       = useState<string | null>(null);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [sendingEmailId, setSendingEmailId] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ type: MessageType; text: string } | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
 
   useEffect(() => {
     supabase
@@ -50,9 +54,13 @@ export default function InvoicesPage() {
   };
 
   const handleDelete = async (invoiceId: string) => {
-    if (!confirm('Supprimer cette facture ? Cette action est irréversible.')) return;
     const { error } = await supabase.from('invoices').delete().eq('id', invoiceId);
-    if (!error) setInvoices(prev => prev.filter(inv => inv.id !== invoiceId));
+    if (error) {
+      setMessage({ type: 'error', text: `Erreur: ${error.message}` });
+      return;
+    }
+    setInvoices(prev => prev.filter(inv => inv.id !== invoiceId));
+    setMessage({ type: 'success', text: 'Facture supprimée avec succès' });
   };
 
   const handleSendEmail = async (invoiceId: string) => {
@@ -60,12 +68,14 @@ export default function InvoicesPage() {
     try {
       const result = await sendInvoiceEmail(invoiceId);
       if (result.success) {
-        alert('Email envoyé avec succès!');
+        await supabase.from('invoices').update({ status: InvoiceStatus.SENT }).eq('id', invoiceId);
+        setInvoices(prev => prev.map(inv => inv.id === invoiceId ? { ...inv, status: InvoiceStatus.SENT } : inv));
+        setMessage({ type: 'success', text: 'Email envoyé avec succès!' });
       } else {
-        alert(`Erreur: ${result.error}`);
+        setMessage({ type: 'error', text: `Erreur: ${result.error}` });
       }
     } catch (err) {
-      alert(`Erreur lors de l'envoi: ${err instanceof Error ? err.message : 'Erreur inconnue'}`);
+      setMessage({ type: 'error', text: `Erreur lors de l'envoi: ${err instanceof Error ? err.message : 'Erreur inconnue'}` });
     } finally {
       setSendingEmailId(null);
     }
@@ -201,14 +211,22 @@ export default function InvoicesPage() {
                               <DropdownMenu.Item
                                 onSelect={() => handleSendEmail(invoice.id)}
                                 disabled={sendingEmailId === invoice.id}
-                                className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 outline-none transition-colors disabled:opacity-50"
+                                className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm cursor-pointer outline-none transition-colors ${
+                                  sendingEmailId === invoice.id
+                                    ? 'bg-blue-50 text-blue-700 hover:bg-blue-50'
+                                    : 'text-gray-700 hover:bg-gray-100'
+                                }`}
                               >
-                                <Mail className="w-3.5 h-3.5 text-gray-400" />
-                                {sendingEmailId === invoice.id ? 'Envoi...' : 'Envoyer par mail'}
+                                {sendingEmailId === invoice.id ? (
+                                  <Loader2 className="w-4 h-4 text-blue-600 animate-spin" />
+                                ) : (
+                                  <Mail className="w-3.5 h-3.5 text-gray-400" />
+                                )}
+                                {sendingEmailId === invoice.id ? 'Envoi en cours...' : 'Envoyer par mail'}
                               </DropdownMenu.Item>
                               <DropdownMenu.Separator className="my-1.5 h-px bg-gray-100" />
                               <DropdownMenu.Item
-                                onSelect={() => handleDelete(invoice.id)}
+                                onSelect={() => setConfirmDelete(invoice.id)}
                                 className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-red-500 cursor-pointer hover:bg-red-50 outline-none transition-colors"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
@@ -226,6 +244,23 @@ export default function InvoicesPage() {
           )}
         </div>
       </div>
+
+      <MessageModal
+        open={message !== null}
+        onOpenChange={(open) => !open && setMessage(null)}
+        type={message?.type}
+        message={message?.text || ''}
+      />
+
+      <ConfirmModal
+        open={confirmDelete !== null}
+        onOpenChange={(open) => !open && setConfirmDelete(null)}
+        title="Supprimer la facture"
+        message="Supprimer cette facture ? Cette action est irréversible."
+        onConfirm={() => confirmDelete && handleDelete(confirmDelete)}
+        confirmText="Supprimer"
+        isDangerous={true}
+      />
     </div>
   );
 }

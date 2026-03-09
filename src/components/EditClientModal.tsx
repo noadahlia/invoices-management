@@ -2,11 +2,17 @@
 
 import { useState } from 'react';
 import { Dialog } from 'radix-ui';
-import { X, UserPlus } from 'lucide-react';
+import { X, UserCog } from 'lucide-react';
 import { supabase } from '@/src/lib/supabase';
+import type { Client } from '@/src/types';
 import MessageModal, { type MessageType } from './ErrorModal';
 
-interface Props { onClientAdded: () => void; }
+interface Props {
+  client: Client;
+  onClientUpdated: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
 
 const FIELDS = [
   { name: 'nom',       label: 'Nom',       type: 'text'  },
@@ -17,15 +23,19 @@ const FIELDS = [
 ] as const;
 
 type FormState = Record<typeof FIELDS[number]['name'], string>;
-const EMPTY_FORM: FormState = { nom: '', prenom: '', email: '', telephone: '', adresse: '' };
 
 const inputCls = "w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-indigo-400 focus:bg-white focus:outline-none focus:ring-3 focus:ring-indigo-500/10 transition-all";
 const labelCls = "text-xs font-semibold text-gray-500 uppercase tracking-wider";
 
-export default function AddClientModal({ onClientAdded }: Props) {
-  const [open, setOpen]       = useState(false);
+export default function EditClientModal({ client, onClientUpdated, open, onOpenChange }: Props) {
   const [loading, setLoading] = useState(false);
-  const [form, setForm]       = useState<FormState>(EMPTY_FORM);
+  const [form, setForm]       = useState<FormState>({
+    nom: client.nom,
+    prenom: client.prenom,
+    email: client.email,
+    telephone: client.telephone,
+    adresse: client.adresse,
+  });
   const [message, setMessage] = useState<{ type: MessageType; text: string } | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -34,22 +44,15 @@ export default function AddClientModal({ onClientAdded }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error: err } = await supabase.from('clients').insert([form]);
+    const { error: err } = await supabase.from('clients').update(form).eq('id', client.id);
     setLoading(false);
     if (err) { setMessage({ type: 'error', text: err.message }); return; }
-    setForm(EMPTY_FORM); setOpen(false); setMessage({ type: 'success', text: 'Client ajouté avec succès' }); onClientAdded();
+    onOpenChange(false); setMessage({ type: 'success', text: 'Client modifié avec succès' }); onClientUpdated();
   };
 
   return (
     <>
-      <Dialog.Root open={open} onOpenChange={setOpen}>
-      <Dialog.Trigger asChild>
-        <button className="flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors shadow-sm">
-          <UserPlus className="w-4 h-4" />
-          Ajouter un client
-        </button>
-      </Dialog.Trigger>
-
+      <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 animate-in fade-in-0" />
         <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-gray-200 bg-white shadow-2xl animate-in fade-in-0 zoom-in-95 overflow-hidden">
@@ -58,9 +61,9 @@ export default function AddClientModal({ onClientAdded }: Props) {
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
-                  <UserPlus className="w-4 h-4" />
+                  <UserCog className="w-4 h-4" />
                 </div>
-                <Dialog.Title className="text-base font-bold text-gray-900">Nouveau client</Dialog.Title>
+                <Dialog.Title className="text-base font-bold text-gray-900">Éditer le client</Dialog.Title>
               </div>
               <Dialog.Close className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
                 <X className="w-4 h-4" />
@@ -84,7 +87,7 @@ export default function AddClientModal({ onClientAdded }: Props) {
               ))}
 
               <button type="submit" disabled={loading} className="mt-1 w-full rounded-xl bg-indigo-600 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50 transition-colors">
-                {loading ? 'Enregistrement...' : 'Enregistrer le client'}
+                {loading ? 'Enregistrement...' : 'Mettre à jour'}
               </button>
             </form>
           </div>
