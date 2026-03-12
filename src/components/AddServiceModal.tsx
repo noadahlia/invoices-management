@@ -1,17 +1,19 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Dialog } from 'radix-ui';
 import { X, Plus } from 'lucide-react';
 import { addService } from '@/app/actions/services';
 
 interface Props { onServiceAdded: () => void; }
 
-const EMPTY_FORM = { description: '', prix_unitaire: '' };
 const inputCls = "w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-indigo-400 focus:bg-white focus:outline-none focus:ring-3 focus:ring-indigo-500/10 transition-all";
 const labelCls = "text-xs font-semibold text-gray-500 uppercase tracking-wider";
 
 export default function AddServiceModal({ onServiceAdded }: Props) {
+  const t = useTranslations('components.add_service_modal');
+  const EMPTY_FORM = { description: '', prix_unitaire: '' };
   const [open, setOpen]       = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm]       = useState(EMPTY_FORM);
@@ -33,7 +35,7 @@ export default function AddServiceModal({ onServiceAdded }: Props) {
       setOpen(false);
       onServiceAdded();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Une erreur est survenue');
+      setError(err instanceof Error ? err.message : t('error_message'));
     } finally {
       setLoading(false);
     }
@@ -44,7 +46,7 @@ export default function AddServiceModal({ onServiceAdded }: Props) {
       <Dialog.Trigger asChild>
         <button className="flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors shadow-sm">
           <Plus className="w-4 h-4" />
-          Ajouter un service
+          {t('button')}
         </button>
       </Dialog.Trigger>
 
@@ -58,7 +60,7 @@ export default function AddServiceModal({ onServiceAdded }: Props) {
                 <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-sky-50 text-sky-600">
                   <Plus className="w-4 h-4" />
                 </div>
-                <Dialog.Title className="text-base font-bold text-gray-900">Nouveau service</Dialog.Title>
+                <Dialog.Title className="text-base font-bold text-gray-900">{t('title')}</Dialog.Title>
               </div>
               <Dialog.Close className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
                 <X className="w-4 h-4" />
@@ -67,16 +69,16 @@ export default function AddServiceModal({ onServiceAdded }: Props) {
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="description" className={labelCls}>Description</label>
+                <label htmlFor="description" className={labelCls}>{t('field_description')}</label>
                 <textarea
                   id="description" name="description" required rows={3}
                   value={form.description} onChange={handleChange}
-                  placeholder="Ex : Développement site web, Consultation..."
+                  placeholder={t('field_description_placeholder')}
                   className={`${inputCls} resize-none`}
                 />
               </div>
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="prix_unitaire" className={labelCls}>Prix unitaire</label>
+                <label htmlFor="prix_unitaire" className={labelCls}>{t('field_unit_price')}</label>
                 <div className="relative">
                   <input
                     id="prix_unitaire" name="prix_unitaire" type="number"
@@ -92,7 +94,7 @@ export default function AddServiceModal({ onServiceAdded }: Props) {
                 <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-600">{error}</p>
               )}
               <button type="submit" disabled={loading} className="mt-1 w-full rounded-xl bg-indigo-600 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50 transition-colors">
-                {loading ? 'Enregistrement...' : 'Enregistrer le service'}
+                {loading ? t('submit_saving') : t('submit')}
               </button>
             </form>
           </div>

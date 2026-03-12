@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { ArrowLeft, Download, FileText } from 'lucide-react';
 import { supabase } from '@/src/lib/supabase';
 import type { Client, Service } from '@/src/types';
@@ -14,6 +15,7 @@ import { downloadInvoicePdf } from '@/src/lib/download-pdf';
 export default function EditInvoicePage() {
   const router = useRouter();
   const { id } = useParams<{ id: string }>();
+  const t = useTranslations('invoices_edit');
 
   const [clients, setClients]       = useState<Client[]>([]);
   const [services, setServices]     = useState<Service[]>([]);
@@ -140,7 +142,7 @@ export default function EditInvoicePage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground text-sm">Chargement...</p>
+        <p className="text-muted-foreground text-sm">{t('loading')}</p>
       </div>
     );
   }
@@ -161,7 +163,7 @@ export default function EditInvoicePage() {
               <FileText className="w-4 h-4 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">Modifier la facture</h1>
+              <h1 className="text-xl font-bold text-gray-900">{t('page_title')}</h1>
               <p className="text-xs text-indigo-600 font-mono mt-0.5">{invoiceNumber}</p>
             </div>
           </div>
@@ -171,7 +173,7 @@ export default function EditInvoicePage() {
             className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 disabled:opacity-50 shadow-sm transition-colors"
           >
             <Download className="w-4 h-4" />
-            {downloading ? 'Génération...' : 'Télécharger PDF'}
+            {downloading ? t('downloading_pdf') : t('download_pdf')}
           </button>
         </div>
 
@@ -185,7 +187,7 @@ export default function EditInvoicePage() {
             </div>
           </div>
           <div className="lg:col-span-1">
-            <InvoiceSummary lines={summaryLines} onSave={handleSave} saving={saving} clientName={clientName} saveLabel="Mettre à jour" />
+            <InvoiceSummary lines={summaryLines} onSave={handleSave} saving={saving} clientName={clientName} saveLabel={t('save_label')} />
             {error && <p className="mt-3 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-600 text-center">{error}</p>}
           </div>
         </div>

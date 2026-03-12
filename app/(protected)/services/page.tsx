@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { ArrowLeft, Briefcase } from 'lucide-react';
 import { getServices } from '@/app/actions/services';
 import type { Service } from '@/src/types';
 import AddServiceModal from '@/src/components/AddServiceModal';
 
 export default function ServicesPage() {
+  const t = useTranslations('services');
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading]   = useState(true);
 
@@ -43,9 +45,9 @@ export default function ServicesPage() {
                 <Briefcase className="w-4 h-4 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Services</h1>
+                <h1 className="text-xl font-bold text-gray-900">{t('page_title')}</h1>
                 <p className="text-xs text-gray-400">
-                  {services.length} enregistré{services.length !== 1 ? 's' : ''}
+                  {services.length} {t('registered_count')}
                 </p>
               </div>
             </div>
@@ -57,22 +59,22 @@ export default function ServicesPage() {
         <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
           {loading ? (
             <div className="flex items-center justify-center py-20 text-gray-400 text-sm">
-              Chargement...
+              {t('loading')}
             </div>
           ) : services.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 gap-3">
               <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-100">
                 <Briefcase className="w-6 h-6 text-gray-300" />
               </div>
-              <p className="text-sm font-medium text-gray-500">Aucun service enregistré</p>
-              <p className="text-xs text-gray-400">Cliquez sur &quot;Ajouter un service&quot; pour commencer.</p>
+              <p className="text-sm font-medium text-gray-500">{t('no_services')}</p>
+              <p className="text-xs text-gray-400">{t('no_services_help')}</p>
             </div>
           ) : (
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50">
-                  <th className="px-6 py-3.5 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">Description</th>
-                  <th className="px-6 py-3.5 text-right text-xs font-bold text-gray-400 uppercase tracking-widest">Prix unitaire</th>
+                  <th className="px-6 py-3.5 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">{t('column_description')}</th>
+                  <th className="px-6 py-3.5 text-right text-xs font-bold text-gray-400 uppercase tracking-widest">{t('column_unit_price')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">

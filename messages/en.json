@@ -1,0 +1,277 @@
+{
+  "login": {
+    "page_title": "Invoice Management",
+    "connect_prompt": "Sign in to your account",
+    "email_label": "Email",
+    "email_placeholder": "you@example.com",
+    "password_label": "Password",
+    "login_button_connecting": "Signing in...",
+    "login_button": "Sign in",
+    "no_account": "Don't have an account?",
+    "signup_button_registering": "Signing up...",
+    "signup_button": "Sign up",
+    "login_success": "Sign in successful!",
+    "signup_success": "Sign up successful! Check your email."
+  },
+  "dashboard": {
+    "system_badge": "Invoicing System",
+    "main_heading": "Invoice",
+    "main_heading_highlight": "Management",
+    "main_description": "Create, manage and export your professional invoices in a few clicks.",
+    "company_label": "Company",
+    "company_description": "Your company information",
+    "clients_label": "Clients",
+    "clients_description": "Manage your client portfolio",
+    "services_label": "Services",
+    "services_description": "Catalog and pricing",
+    "invoices_label": "Invoices",
+    "invoices_description": "Tracking and PDF generation"
+  },
+  "clients": {
+    "page_title": "Clients",
+    "registered_count": "registered",
+    "column_first_name": "First Name",
+    "column_last_name": "Last Name",
+    "column_email": "Email",
+    "column_phone": "Phone",
+    "column_address": "Address",
+    "loading": "Loading...",
+    "no_clients": "No clients registered",
+    "no_clients_help": "Click \"Add a client\" to get started.",
+    "edit_action": "Edit",
+    "error_auth": "An error occurred"
+  },
+  "services": {
+    "page_title": "Services",
+    "registered_count": "registered",
+    "loading": "Loading...",
+    "no_services": "No services registered",
+    "no_services_help": "Click \"Add a service\" to get started.",
+    "column_description": "Description",
+    "column_unit_price": "Unit Price"
+  },
+  "company": {
+    "page_title": "Company",
+    "company_info": "Registered information",
+    "no_company": "No company registered",
+    "loading": "Loading...",
+    "empty_state": "No company registered",
+    "empty_state_help": "Click \"Add company\" to get started.",
+    "field_name": "Name",
+    "field_siret": "SIRET",
+    "field_address": "Address",
+    "field_email": "Email",
+    "field_phone": "Phone",
+    "email_config_title": "Email Configuration",
+    "email_config_empty": "No email configuration",
+    "email_config_help": "Click \"Modify email\" to configure invoice sending by email.",
+    "email_subject_label": "Email subject:"
+  },
+  "invoices": {
+    "page_title": "Invoices",
+    "invoice_count": "invoice(s)",
+    "new_invoice_button": "New Invoice",
+    "loading": "Loading...",
+    "no_invoices": "No invoices registered",
+    "create_first_invoice": "Create your first invoice",
+    "column_number": "Number",
+    "column_client": "Client",
+    "column_amount_ht": "Amount ex. tax",
+    "column_status": "Status",
+    "column_date": "Date",
+    "status_unpaid": "Unpaid",
+    "status_sent": "Sent",
+    "status_paid": "Paid",
+    "edit_action": "Edit",
+    "download_pdf": "Download PDF",
+    "downloading_pdf": "Generating...",
+    "send_email": "Send by email",
+    "sending_email": "Sending...",
+    "delete_action": "Delete",
+    "delete_confirmation_title": "Delete Invoice",
+    "delete_confirmation_message": "Delete this invoice? This action is irreversible.",
+    "delete_confirmation_button": "Delete",
+    "success_pdf_generated": "PDF generated successfully!",
+    "error_pdf_generation": "Error generating PDF:",
+    "error_delete": "Error:",
+    "success_deleted": "Invoice deleted successfully",
+    "success_email_sent": "Email sent successfully!",
+    "error_email_send": "Error sending:",
+    "error_unknown": "Unknown error",
+    "config_button": "Configure"
+  },
+  "invoices_new": {
+    "page_title": "New Invoice",
+    "no_services_available": "No services available.",
+    "add_services_link": "Add services",
+    "error_create_invoice": "Error creating invoice."
+  },
+  "invoices_edit": {
+    "page_title": "Edit Invoice",
+    "loading": "Loading...",
+    "download_pdf": "Download PDF",
+    "downloading_pdf": "Generating...",
+    "save_label": "Update"
+  },
+  "components": {
+    "add_client_modal": {
+      "button": "Add a client",
+      "title": "New Client",
+      "field_last_name": "Last Name",
+      "field_first_name": "First Name",
+      "field_email": "Email",
+      "field_phone": "Phone",
+      "field_address": "Address",
+      "submit_saving": "Saving...",
+      "submit": "Save Client",
+      "success_message": "Client added successfully",
+      "error_message": "An error occurred"
+    },
+    "add_service_modal": {
+      "button": "Add a service",
+      "title": "New Service",
+      "field_description": "Description",
+      "field_description_placeholder": "E.g.: Website development, Consulting...",
+      "field_unit_price": "Unit Price",
+      "submit_saving": "Saving...",
+      "submit": "Save Service",
+      "error_message": "An error occurred"
+    },
+    "edit_client_modal": {
+      "title": "Edit Client",
+      "field_last_name": "Last Name",
+      "field_first_name": "First Name",
+      "field_email": "Email",
+      "field_phone": "Phone",
+      "field_address": "Address",
+      "submit_saving": "Saving...",
+      "submit": "Update",
+      "success_message": "Client updated successfully",
+      "error_message": "An error occurred"
+    },
+    "edit_company_modal": {
+      "button_edit": "Edit",
+      "button_add": "Add",
+      "button_text": "company",
+      "title_edit": "Edit Company",
+      "title_add": "New Company",
+      "field_name": "Company Name",
+      "field_address": "Address",
+      "field_city": "City",
+      "field_email": "Email",
+      "field_phone": "Phone",
+      "field_siret": "SIRET",
+      "submit_saving": "Saving...",
+      "submit": "Save",
+      "error_message": "An error occurred"
+    },
+    "smtp_settings_modal": {
+      "button": "Edit Email",
+      "title": "Email Configuration",
+      "smtp_type_label": "SMTP Provider",
+      "smtp_preset_gmail": "Gmail",
+      "smtp_preset_outlook": "Outlook",
+      "smtp_preset_custom": "Custom SMTP",
+      "smtp_host_label": "SMTP Server",
+      "smtp_host_placeholder": "smtp.example.com",
+      "smtp_port_label": "Port",
+      "smtp_port_placeholder": "587",
+      "smtp_user_label": "SMTP Email",
+      "smtp_user_placeholder": "your.email@gmail.com",
+      "smtp_pass_label": "Application Password",
+      "smtp_pass_help": "This is not your email password. For Gmail, go to Google Account > Security > Two-Step Verification > App passwords.",
+      "email_subject_label": "Email Subject",
+      "email_subject_placeholder": "Your invoice",
+      "email_message_label": "Email Body",
+      "email_message_placeholder": "Please find your invoice attached.",
+      "email_message_default": "Please find your invoice attached.",
+      "email_subject_default": "Your invoice",
+      "submit_saving": "Saving...",
+      "submit": "Save",
+      "error_no_company": "No company registered. Please create a company first.",
+      "error_message": "An error occurred"
+    },
+    "client_selector": {
+      "label": "Client",
+      "placeholder": "Select a client..."
+    },
+    "service_catalog": {
+      "label": "Service Catalog",
+      "selected_count": "selected",
+      "unit_label": "unit"
+    },
+    "invoice_summary": {
+      "title": "Summary",
+      "no_client_selected": "No client selected",
+      "no_services_selected": "No service selected",
+      "total_label": "Total ex. tax",
+      "create_button": "Create Invoice",
+      "saving": "Saving...",
+      "client_required": "Select a client to continue"
+    },
+    "confirm_modal": {
+      "default_confirm": "Confirm",
+      "default_cancel": "Cancel"
+    },
+    "error_modal": {
+      "close_button": "Close",
+      "error_title": "Error",
+      "success_title": "Success",
+      "info_title": "Information",
+      "warning_title": "Warning"
+    },
+    "logout_button": {
+      "button": "Logout"
+    }
+  },
+  "pdf": {
+    "invoice_document": {
+      "title": "INVOICE",
+      "from_label": "From",
+      "to_label": "Bill To",
+      "column_description": "Description",
+      "column_quantity": "Qty",
+      "column_unit_price": "Unit Price",
+      "column_total": "Total",
+      "subtotal_label": "Subtotal ex. tax",
+      "total_label": "Total ex. tax",
+      "status_unpaid": "Unpaid",
+      "status_sent": "Sent",
+      "status_paid": "Paid",
+      "default_company_name": "My Company",
+      "default_company_address": "12 Rue de la République",
+      "default_company_city": "75001 Paris, France",
+      "default_company_email": "contact@mycompany.fr",
+      "default_company_phone": "+33 1 00 00 00 00",
+      "default_company_siret": "SIRET : 000 000 000 00000",
+      "siret_prefix": "SIRET : "
+    }
+  },
+  "server_actions": {
+    "clients": {
+      "not_authenticated": "Not authenticated",
+      "error_prefix": "Error:",
+      "generic_error": "An error occurred"
+    },
+    "services": {
+      "not_authenticated": "Not authenticated",
+      "error_prefix": "Error:",
+      "generic_error": "An error occurred"
+    },
+    "company": {
+      "not_authenticated": "Not authenticated",
+      "error_prefix": "Error:",
+      "generic_error": "An error occurred"
+    },
+    "invoices": {
+      "not_authenticated": "Not authenticated",
+      "error_prefix": "Error:",
+      "create_error": "Error creating invoice",
+      "generic_error": "An error occurred"
+    }
+  },
+  "metadata": {
+    "title": "Invoice Management",
+    "description": "Automated invoice generation system"
+  }
+}

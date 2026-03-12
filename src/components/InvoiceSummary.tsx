@@ -1,3 +1,6 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
 import { Receipt, User } from 'lucide-react';
 
 export interface SummaryLine {
@@ -14,7 +17,9 @@ interface Props {
   saveLabel?: string;
 }
 
-export default function InvoiceSummary({ lines, onSave, saving, clientName, saveLabel = 'Créer la facture' }: Props) {
+export default function InvoiceSummary({ lines, onSave, saving, clientName, saveLabel }: Props) {
+  const t = useTranslations('components.invoice_summary');
+  const finalSaveLabel = saveLabel ?? t('create_button');
   const total    = lines.reduce((sum, l) => sum + l.quantity * l.unit_price, 0);
   const hasItems = lines.length > 0;
   const canSave  = hasItems && !!clientName;
@@ -24,7 +29,7 @@ export default function InvoiceSummary({ lines, onSave, saving, clientName, save
       {/* Header */}
       <div className="border-b border-gray-100 px-5 py-4 flex items-center gap-2.5 bg-gray-50">
         <Receipt className="w-4 h-4 text-indigo-500" />
-        <span className="text-sm font-bold text-gray-800">Résumé</span>
+        <span className="text-sm font-bold text-gray-800">{t('title')}</span>
       </div>
 
       <div className="p-5 flex flex-col gap-4">
@@ -36,7 +41,7 @@ export default function InvoiceSummary({ lines, onSave, saving, clientName, save
         }`}>
           <User className={`w-3.5 h-3.5 shrink-0 ${clientName ? 'text-indigo-500' : 'text-gray-300'}`} />
           <span className={`text-xs truncate ${clientName ? 'text-indigo-700 font-semibold' : 'text-gray-400 italic'}`}>
-            {clientName || 'Aucun client sélectionné'}
+            {clientName || t('no_client_selected')}
           </span>
         </div>
 
@@ -57,13 +62,13 @@ export default function InvoiceSummary({ lines, onSave, saving, clientName, save
           </div>
         ) : (
           <div className="rounded-xl border border-dashed border-gray-200 py-6 text-center bg-gray-50">
-            <p className="text-xs text-gray-400">Aucun service sélectionné</p>
+            <p className="text-xs text-gray-400">{t('no_services_selected')}</p>
           </div>
         )}
 
         {/* Total */}
         <div className="rounded-xl bg-indigo-600 px-4 py-3.5 flex items-center justify-between shadow-sm shadow-indigo-200">
-          <span className="text-sm font-bold text-indigo-100">Total HT</span>
+          <span className="text-sm font-bold text-indigo-100">{t('total_label')}</span>
           <span className="text-xl font-extrabold tabular-nums text-white">
             {total.toFixed(2)} €
           </span>
@@ -79,13 +84,13 @@ export default function InvoiceSummary({ lines, onSave, saving, clientName, save
           {saving ? (
             <span className="flex items-center justify-center gap-2">
               <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-indigo-200 border-t-indigo-600" />
-              Enregistrement...
+              {t('saving')}
             </span>
-          ) : saveLabel}
+          ) : finalSaveLabel}
         </button>
 
         {!clientName && (
-          <p className="text-center text-xs text-gray-400">Sélectionnez un client pour continuer</p>
+          <p className="text-center text-xs text-gray-400">{t('client_required')}</p>
         )}
       </div>
     </div>

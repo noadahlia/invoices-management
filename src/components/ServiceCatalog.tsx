@@ -1,3 +1,6 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
 import { Minus, Plus } from 'lucide-react';
 import { Service } from '@/src/types';
 
@@ -8,17 +11,18 @@ interface Props {
 }
 
 export default function ServiceCatalog({ services, quantities, onQuantityChange }: Props) {
+  const t = useTranslations('components.service_catalog');
   const selectedCount = Object.values(quantities).filter(q => q > 0).length;
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-          Catalogue de services
+          {t('label')}
         </span>
         {selectedCount > 0 && (
           <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-600">
-            {selectedCount} sélectionné{selectedCount > 1 ? 's' : ''}
+            {selectedCount} {t('selected_count')}
           </span>
         )}
       </div>
@@ -41,7 +45,7 @@ export default function ServiceCatalog({ services, quantities, onQuantityChange 
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-gray-900 leading-snug">{service.description}</p>
                   <p className={`text-xs mt-0.5 tabular-nums font-medium ${selected ? 'text-indigo-600' : 'text-gray-400'}`}>
-                    {service.prix_unitaire.toFixed(2)} € / unité
+                    {service.prix_unitaire.toFixed(2)} € / {t('unit_label')}
                   </p>
                 </div>
                 {selected && (

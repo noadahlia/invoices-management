@@ -1,0 +1,277 @@
+{
+  "login": {
+    "page_title": "Gestion de Factures",
+    "connect_prompt": "Connectez-vous à votre compte",
+    "email_label": "Email",
+    "email_placeholder": "vous@exemple.com",
+    "password_label": "Mot de passe",
+    "login_button_connecting": "Connexion...",
+    "login_button": "Se connecter",
+    "no_account": "Pas encore de compte?",
+    "signup_button_registering": "Inscription...",
+    "signup_button": "S'inscrire",
+    "login_success": "Connexion réussie!",
+    "signup_success": "Inscription réussie! Vérifiez votre email."
+  },
+  "dashboard": {
+    "system_badge": "Système de facturation",
+    "main_heading": "Gestion de",
+    "main_heading_highlight": "Factures",
+    "main_description": "Créez, gérez et exportez vos factures professionnelles en quelques clics.",
+    "company_label": "Entreprise",
+    "company_description": "Informations de votre entreprise",
+    "clients_label": "Clients",
+    "clients_description": "Gérez votre portefeuille client",
+    "services_label": "Services",
+    "services_description": "Catalogue et tarification",
+    "invoices_label": "Factures",
+    "invoices_description": "Suivi et génération PDF"
+  },
+  "clients": {
+    "page_title": "Clients",
+    "registered_count": "enregistré{clients.length !== 1 ? 's' : ''}",
+    "column_first_name": "Prénom",
+    "column_last_name": "Nom",
+    "column_email": "Email",
+    "column_phone": "Téléphone",
+    "column_address": "Adresse",
+    "loading": "Chargement...",
+    "no_clients": "Aucun client enregistré",
+    "no_clients_help": "Cliquez sur &quot;Ajouter un client&quot; pour commencer.",
+    "edit_action": "Modifier",
+    "error_auth": "Une erreur est survenue"
+  },
+  "services": {
+    "page_title": "Services",
+    "registered_count": "enregistré{services.length !== 1 ? 's' : ''}",
+    "loading": "Chargement...",
+    "no_services": "Aucun service enregistré",
+    "no_services_help": "Cliquez sur &quot;Ajouter un service&quot; pour commencer.",
+    "column_description": "Description",
+    "column_unit_price": "Prix unitaire"
+  },
+  "company": {
+    "page_title": "Entreprise",
+    "company_info": "Informations enregistrées",
+    "no_company": "Aucune entreprise enregistrée",
+    "loading": "Chargement...",
+    "empty_state": "Aucune entreprise enregistrée",
+    "empty_state_help": "Cliquez sur &quot;Ajouter entreprise&quot; pour commencer.",
+    "field_name": "Nom",
+    "field_siret": "SIRET",
+    "field_address": "Adresse",
+    "field_email": "Email",
+    "field_phone": "Téléphone",
+    "email_config_title": "Configuration email",
+    "email_config_empty": "Aucune configuration email",
+    "email_config_help": "Cliquez sur &quot;Modifier email&quot; pour configurer l'envoi de factures par email.",
+    "email_subject_label": "Objet des emails:"
+  },
+  "invoices": {
+    "page_title": "Factures",
+    "invoice_count": "facture{invoices.length !== 1 ? 's' : ''}",
+    "new_invoice_button": "Nouvelle facture",
+    "loading": "Chargement...",
+    "no_invoices": "Aucune facture enregistrée",
+    "create_first_invoice": "Créer une première facture",
+    "column_number": "Numéro",
+    "column_client": "Client",
+    "column_amount_ht": "Montant HT",
+    "column_status": "Statut",
+    "column_date": "Date",
+    "status_unpaid": "Non payée",
+    "status_sent": "Envoyée",
+    "status_paid": "Payée",
+    "edit_action": "Modifier",
+    "download_pdf": "Télécharger PDF",
+    "downloading_pdf": "Génération...",
+    "send_email": "Envoyer par mail",
+    "sending_email": "Envoi en cours...",
+    "delete_action": "Supprimer",
+    "delete_confirmation_title": "Supprimer la facture",
+    "delete_confirmation_message": "Supprimer cette facture ? Cette action est irréversible.",
+    "delete_confirmation_button": "Supprimer",
+    "success_pdf_generated": "PDF généré avec succès!",
+    "error_pdf_generation": "Erreur lors de la génération du PDF:",
+    "error_delete": "Erreur:",
+    "success_deleted": "Facture supprimée avec succès",
+    "success_email_sent": "Email envoyé avec succès!",
+    "error_email_send": "Erreur lors de l'envoi:",
+    "error_unknown": "Erreur inconnue",
+    "config_button": "Configurer"
+  },
+  "invoices_new": {
+    "page_title": "Nouvelle facture",
+    "no_services_available": "Aucun service disponible.",
+    "add_services_link": "Ajouter des services",
+    "error_create_invoice": "Erreur lors de la création de la facture."
+  },
+  "invoices_edit": {
+    "page_title": "Modifier la facture",
+    "loading": "Chargement...",
+    "download_pdf": "Télécharger PDF",
+    "downloading_pdf": "Génération...",
+    "save_label": "Mettre à jour"
+  },
+  "components": {
+    "add_client_modal": {
+      "button": "Ajouter un client",
+      "title": "Nouveau client",
+      "field_last_name": "Nom",
+      "field_first_name": "Prénom",
+      "field_email": "Email",
+      "field_phone": "Téléphone",
+      "field_address": "Adresse",
+      "submit_saving": "Enregistrement...",
+      "submit": "Enregistrer le client",
+      "success_message": "Client ajouté avec succès",
+      "error_message": "Une erreur est survenue"
+    },
+    "add_service_modal": {
+      "button": "Ajouter un service",
+      "title": "Nouveau service",
+      "field_description": "Description",
+      "field_description_placeholder": "Ex : Développement site web, Consultation...",
+      "field_unit_price": "Prix unitaire",
+      "submit_saving": "Enregistrement...",
+      "submit": "Enregistrer le service",
+      "error_message": "Une erreur est survenue"
+    },
+    "edit_client_modal": {
+      "title": "Éditer le client",
+      "field_last_name": "Nom",
+      "field_first_name": "Prénom",
+      "field_email": "Email",
+      "field_phone": "Téléphone",
+      "field_address": "Adresse",
+      "submit_saving": "Enregistrement...",
+      "submit": "Mettre à jour",
+      "success_message": "Client modifié avec succès",
+      "error_message": "Une erreur est survenue"
+    },
+    "edit_company_modal": {
+      "button_edit": "Modifier",
+      "button_add": "Ajouter",
+      "button_text": "entreprise",
+      "title_edit": "Modifier entreprise",
+      "title_add": "Nouvelle entreprise",
+      "field_name": "Nom entreprise",
+      "field_address": "Adresse",
+      "field_city": "Ville",
+      "field_email": "Email",
+      "field_phone": "Téléphone",
+      "field_siret": "SIRET",
+      "submit_saving": "Enregistrement...",
+      "submit": "Enregistrer",
+      "error_message": "Une erreur est survenue"
+    },
+    "smtp_settings_modal": {
+      "button": "Modifier email",
+      "title": "Configuration email",
+      "smtp_type_label": "Provider SMTP",
+      "smtp_preset_gmail": "Gmail",
+      "smtp_preset_outlook": "Outlook",
+      "smtp_preset_custom": "SMTP personnalisé",
+      "smtp_host_label": "Serveur SMTP",
+      "smtp_host_placeholder": "smtp.example.com",
+      "smtp_port_label": "Port",
+      "smtp_port_placeholder": "587",
+      "smtp_user_label": "Email SMTP",
+      "smtp_user_placeholder": "votre.email@gmail.com",
+      "smtp_pass_label": "Mot de passe d'application",
+      "smtp_pass_help": "Ce n'est pas le mot de passe de votre boîte mail. Pour Gmail, allez dans Compte Google > Sécurité > Validation en deux étapes > Mots de passe d'application.",
+      "email_subject_label": "Objet de l'email",
+      "email_subject_placeholder": "Votre facture",
+      "email_message_label": "Corps du message",
+      "email_message_placeholder": "Veuillez trouver en pièce jointe votre facture.",
+      "email_message_default": "Veuillez trouver en pièce jointe votre facture.",
+      "email_subject_default": "Votre facture",
+      "submit_saving": "Enregistrement...",
+      "submit": "Enregistrer",
+      "error_no_company": "Aucune entreprise enregistrée. Veuillez d'abord créer une entreprise.",
+      "error_message": "Une erreur est survenue"
+    },
+    "client_selector": {
+      "label": "Client",
+      "placeholder": "Sélectionner un client..."
+    },
+    "service_catalog": {
+      "label": "Catalogue de services",
+      "selected_count": "sélectionné{selectedCount > 1 ? 's' : ''}",
+      "unit_label": "unité"
+    },
+    "invoice_summary": {
+      "title": "Résumé",
+      "no_client_selected": "Aucun client sélectionné",
+      "no_services_selected": "Aucun service sélectionné",
+      "total_label": "Total HT",
+      "create_button": "Créer la facture",
+      "saving": "Enregistrement...",
+      "client_required": "Sélectionnez un client pour continuer"
+    },
+    "confirm_modal": {
+      "default_confirm": "Confirmer",
+      "default_cancel": "Annuler"
+    },
+    "error_modal": {
+      "close_button": "Fermer",
+      "error_title": "Erreur",
+      "success_title": "Succès",
+      "info_title": "Information",
+      "warning_title": "Attention"
+    },
+    "logout_button": {
+      "button": "Déconnexion"
+    }
+  },
+  "pdf": {
+    "invoice_document": {
+      "title": "FACTURE",
+      "from_label": "De",
+      "to_label": "Facturer à",
+      "column_description": "Description",
+      "column_quantity": "Qté",
+      "column_unit_price": "Prix unit.",
+      "column_total": "Total",
+      "subtotal_label": "Sous-total HT",
+      "total_label": "Total HT",
+      "status_unpaid": "Non payée",
+      "status_sent": "Envoyée",
+      "status_paid": "Payée",
+      "default_company_name": "Mon Entreprise",
+      "default_company_address": "12 Rue de la République",
+      "default_company_city": "75001 Paris, France",
+      "default_company_email": "contact@monentreprise.fr",
+      "default_company_phone": "+33 1 00 00 00 00",
+      "default_company_siret": "SIRET : 000 000 000 00000",
+      "siret_prefix": "SIRET : "
+    }
+  },
+  "server_actions": {
+    "clients": {
+      "not_authenticated": "Non authentifié",
+      "error_prefix": "Erreur:",
+      "generic_error": "Une erreur est survenue"
+    },
+    "services": {
+      "not_authenticated": "Non authentifié",
+      "error_prefix": "Erreur:",
+      "generic_error": "Une erreur est survenue"
+    },
+    "company": {
+      "not_authenticated": "Non authentifié",
+      "error_prefix": "Erreur:",
+      "generic_error": "Une erreur est survenue"
+    },
+    "invoices": {
+      "not_authenticated": "Non authentifié",
+      "error_prefix": "Erreur:",
+      "create_error": "Erreur lors de la création de la facture",
+      "generic_error": "Une erreur est survenue"
+    }
+  },
+  "metadata": {
+    "title": "Gestion de Factures",
+    "description": "Système de génération de factures automatisé"
+  }
+}

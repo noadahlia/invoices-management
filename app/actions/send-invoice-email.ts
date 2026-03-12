@@ -1,5 +1,6 @@
 'use server';
 
+import { getTranslations } from 'next-intl/server';
 import nodemailer from 'nodemailer';
 import { getSupabaseServerClient } from '@/src/lib/server-auth';
 import { generateInvoicePdf } from './generate-pdf';
@@ -12,11 +13,12 @@ interface SendEmailResult {
 
 export async function sendInvoiceEmail(invoiceId: string): Promise<SendEmailResult> {
   try {
+    const t = await getTranslations('server_actions.invoices');
     const supabase = await getSupabaseServerClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      return { success: false, error: 'Non authentifié' };
+      return { success: false, error: t('not_authenticated') };
     }
 
     // Get invoice with client info (filtered by user_id)
@@ -32,7 +34,7 @@ export async function sendInvoiceEmail(invoiceId: string): Promise<SendEmailResu
     }
 
     if (!invoice.clients || !invoice.clients.email) {
-      return { success: false, error: 'Email du client non configuré. Veuillez ajouter un email au client.', errorType: 'client_email_missing' };
+      return { success: false, error: 'Client email not configured. Please add an email to the client.', errorType: 'client_email_missing' };
     }
 
     // Get company SMTP settings (filtered by user_id)
@@ -47,18 +49,18 @@ export async function sendInvoiceEmail(invoiceId: string): Promise<SendEmailResu
       if (companyError && companyError.code !== 'PGRST116') {
         return { success: false, error: companyError.message, errorType: 'unknown' };
       }
-      return { success: false, error: 'Votre entreprise n\'est pas configurée.', errorType: 'company_not_found' };
+      return { success: false, error: 'Your company is not configured.', errorType: 'company_not_found' };
     }
 
     // Validate SMTP configuration
     if (!company.smtp_host || !company.smtp_port || !company.smtp_user || !company.smtp_pass) {
-      return { success: false, error: 'Configuration email incomplète.', errorType: 'smtp_incomplete' };
+      return { success: false, error: 'Email configuration incomplete.', errorType: 'smtp_incomplete' };
     }
 
     // Generate PDF
     const pdfResult = await generateInvoicePdf(invoiceId);
     if (!pdfResult.success) {
-      return { success: false, error: `Erreur lors de la génération du PDF: ${pdfResult.error}`, errorType: 'unknown' };
+      return { success: false, error: `Error generating PDF: ${pdfResult.error}`, errorType: 'unknown' };
     }
     const pdfBase64 = pdfResult.data!;
 
@@ -80,8 +82,8 @@ export async function sendInvoiceEmail(invoiceId: string): Promise<SendEmailResu
     const mailOptions = {
       from: company.smtp_user,
       to: invoice.clients.email,
-      subject: company.email_subject || 'Votre facture',
-      text: company.email_message || 'Veuillez trouver en pièce jointe votre facture.',
+      subject: company.email_subject || 'Your Invoice',
+      text: company.email_message || 'Please find your invoice attached.',
       attachments: [
         {
           filename: `Invoice-${invoice.invoice_number}.pdf`,
@@ -95,7 +97,7 @@ export async function sendInvoiceEmail(invoiceId: string): Promise<SendEmailResu
 
     return { success: true };
   } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue lors de l\'envoi de l\'email';
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error sending email';
     console.error('Email sending error:', errorMessage);
     return { success: false, error: errorMessage };
   }

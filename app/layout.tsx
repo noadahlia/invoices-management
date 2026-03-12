@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import "./globals.css";
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -14,16 +16,24 @@ const jetbrainsMono = JetBrains_Mono({
   weight:   ["400", "500", "600"],
 });
 
-export const metadata: Metadata = {
-  title: "Gestion de Factures",
-  description: "Système de génération de factures automatisé",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("metadata");
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="fr" className={`${plusJakarta.variable} ${jetbrainsMono.variable}`}>
+    <html lang={locale} className={`${plusJakarta.variable} ${jetbrainsMono.variable}`}>
       <body className="antialiased">
-        {children}
+        <NextIntlClientProvider messages={messages}>
+          {children}
+        </NextIntlClientProvider>
       </body>
     </html>
   );

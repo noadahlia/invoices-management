@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Dialog } from 'radix-ui';
 import { X, AlertCircle } from 'lucide-react';
 
@@ -20,10 +21,13 @@ export default function ConfirmModal({
   title,
   message,
   onConfirm,
-  confirmText = 'Confirmer',
-  cancelText = 'Annuler',
+  confirmText,
+  cancelText,
   isDangerous = false,
 }: Props) {
+  const t = useTranslations('components.confirm_modal');
+  const defaultConfirmText = confirmText ?? t('default_confirm');
+  const defaultCancelText = cancelText ?? t('default_cancel');
   const handleConfirm = () => {
     onConfirm();
     onOpenChange(false);
@@ -55,7 +59,7 @@ export default function ConfirmModal({
                 onClick={() => onOpenChange(false)}
                 className="flex-1 rounded-xl border border-gray-200 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
               >
-                {cancelText}
+                {defaultCancelText}
               </button>
               <button
                 onClick={handleConfirm}
@@ -65,7 +69,7 @@ export default function ConfirmModal({
                     : 'bg-indigo-600 hover:bg-indigo-700'
                 }`}
               >
-                {confirmText}
+                {defaultConfirmText}
               </button>
             </div>
           </div>

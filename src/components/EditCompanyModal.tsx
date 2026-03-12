@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { Dialog } from 'radix-ui';
 import { X, Building2 } from 'lucide-react';
 import { updateCompany } from '@/app/actions/company';
@@ -8,22 +9,23 @@ import type { Company } from '@/src/types';
 
 interface Props { company: Company | null; onCompanySaved: () => void; }
 
-const FIELDS = [
-  { name: 'nom',       label: 'Nom entreprise', type: 'text'  },
-  { name: 'adresse',   label: 'Adresse',       type: 'text'  },
-  { name: 'ville',     label: 'Ville',         type: 'text'  },
-  { name: 'email',     label: 'Email',         type: 'email' },
-  { name: 'telephone', label: 'Téléphone',     type: 'tel'   },
-  { name: 'siret',     label: 'SIRET',         type: 'text'  },
-] as const;
-
-type FormState = Record<typeof FIELDS[number]['name'], string>;
-const EMPTY_FORM: FormState = { nom: '', adresse: '', ville: '', email: '', telephone: '', siret: '' };
-
 const inputCls = "w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-indigo-400 focus:bg-white focus:outline-none focus:ring-3 focus:ring-indigo-500/10 transition-all";
 const labelCls = "text-xs font-semibold text-gray-500 uppercase tracking-wider";
 
 export default function EditCompanyModal({ company, onCompanySaved }: Props) {
+  const t = useTranslations('components.edit_company_modal');
+
+  const FIELDS = [
+    { name: 'nom',       label: t('field_name'),     type: 'text'  },
+    { name: 'adresse',   label: t('field_address'),   type: 'text'  },
+    { name: 'ville',     label: t('field_city'),      type: 'text'  },
+    { name: 'email',     label: t('field_email'),     type: 'email' },
+    { name: 'telephone', label: t('field_phone'),     type: 'tel'   },
+    { name: 'siret',     label: t('field_siret'),     type: 'text'  },
+  ] as const;
+
+  type FormState = Record<typeof FIELDS[number]['name'], string>;
+  const EMPTY_FORM: FormState = { nom: '', adresse: '', ville: '', email: '', telephone: '', siret: '' };
   const [open, setOpen]       = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm]       = useState<FormState>(EMPTY_FORM);
@@ -54,7 +56,7 @@ export default function EditCompanyModal({ company, onCompanySaved }: Props) {
       setOpen(false);
       onCompanySaved();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Une erreur est survenue');
+      setError(err instanceof Error ? err.message : t('error_message'));
     } finally {
       setLoading(false);
     }
@@ -65,7 +67,7 @@ export default function EditCompanyModal({ company, onCompanySaved }: Props) {
       <Dialog.Trigger asChild>
         <button className="flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors shadow-sm">
           <Building2 className="w-4 h-4" />
-          {company ? 'Modifier' : 'Ajouter'} entreprise
+          {company ? t('button_edit') : t('button_add')} {t('button_text')}
         </button>
       </Dialog.Trigger>
 
@@ -80,7 +82,7 @@ export default function EditCompanyModal({ company, onCompanySaved }: Props) {
                   <Building2 className="w-4 h-4" />
                 </div>
                 <Dialog.Title className="text-base font-bold text-gray-900">
-                  {company ? 'Modifier entreprise' : 'Nouvelle entreprise'}
+                  {company ? t('title_edit') : t('title_add')}
                 </Dialog.Title>
               </div>
               <Dialog.Close className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
@@ -108,7 +110,7 @@ export default function EditCompanyModal({ company, onCompanySaved }: Props) {
                 <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-600">{error}</p>
               )}
               <button type="submit" disabled={loading} className="mt-1 w-full rounded-xl bg-indigo-600 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50 transition-colors">
-                {loading ? 'Enregistrement...' : 'Enregistrer'}
+                {loading ? t('submit_saving') : t('submit')}
               </button>
             </form>
           </div>

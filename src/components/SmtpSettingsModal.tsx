@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { Dialog } from 'radix-ui';
 import { X, Mail, Info } from 'lucide-react';
 import { updateCompany } from '@/app/actions/company';
@@ -10,37 +11,38 @@ interface Props { company: Company | null; onSettingsSaved: () => void; }
 
 type SmtpType = 'gmail' | 'outlook' | 'smtp-custom';
 
-const SMTP_PRESETS: Record<SmtpType, { label: string; host?: string; port?: number }> = {
-  'gmail': { label: 'Gmail', host: 'smtp.gmail.com', port: 587 },
-  'outlook': { label: 'Outlook', host: 'smtp.office365.com', port: 587 },
-  'smtp-custom': { label: 'SMTP personnalisé', host: undefined, port: undefined },
-};
-
-interface FormState {
-  smtp_type: SmtpType;
-  smtp_host: string;
-  smtp_port: number | '';
-  smtp_user: string;
-  smtp_pass: string;
-  email_subject: string;
-  email_message: string;
-}
-
-const EMPTY_FORM: FormState = {
-  smtp_type: 'gmail',
-  smtp_host: 'smtp.gmail.com',
-  smtp_port: 587,
-  smtp_user: '',
-  smtp_pass: '',
-  email_subject: 'Votre facture',
-  email_message: 'Veuillez trouver en pièce jointe votre facture.',
-};
-
 const inputCls = "w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-indigo-400 focus:bg-white focus:outline-none focus:ring-3 focus:ring-indigo-500/10 transition-all";
 const labelCls = "text-xs font-semibold text-gray-500 uppercase tracking-wider";
 const selectCls = "w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 focus:border-indigo-400 focus:bg-white focus:outline-none focus:ring-3 focus:ring-indigo-500/10 transition-all";
 
 export default function SmtpSettingsModal({ company, onSettingsSaved }: Props) {
+  const t = useTranslations('components.smtp_settings_modal');
+
+  const SMTP_PRESETS: Record<SmtpType, { label: string; host?: string; port?: number }> = {
+    'gmail': { label: t('smtp_preset_gmail'), host: 'smtp.gmail.com', port: 587 },
+    'outlook': { label: t('smtp_preset_outlook'), host: 'smtp.office365.com', port: 587 },
+    'smtp-custom': { label: t('smtp_preset_custom'), host: undefined, port: undefined },
+  };
+
+  interface FormState {
+    smtp_type: SmtpType;
+    smtp_host: string;
+    smtp_port: number | '';
+    smtp_user: string;
+    smtp_pass: string;
+    email_subject: string;
+    email_message: string;
+  }
+
+  const EMPTY_FORM: FormState = {
+    smtp_type: 'gmail',
+    smtp_host: 'smtp.gmail.com',
+    smtp_port: 587,
+    smtp_user: '',
+    smtp_pass: '',
+    email_subject: t('email_subject_default'),
+    email_message: t('email_message_default'),
+  };
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
@@ -54,11 +56,11 @@ export default function SmtpSettingsModal({ company, onSettingsSaved }: Props) {
         smtp_port: company.smtp_port || 587,
         smtp_user: company.smtp_user || '',
         smtp_pass: company.smtp_pass || '',
-        email_subject: company.email_subject || 'Votre facture',
-        email_message: company.email_message || 'Veuillez trouver en pièce jointe votre facture.',
+        email_subject: company.email_subject || t('email_subject_default'),
+        email_message: company.email_message || t('email_message_default'),
       });
     }
-  }, [company, open]);
+  }, [company, open, t]);
 
   const handleSmtpTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newType = e.target.value as SmtpType;
@@ -85,7 +87,7 @@ export default function SmtpSettingsModal({ company, onSettingsSaved }: Props) {
     setError(null);
 
     if (!company) {
-      setError('Aucune entreprise enregistrée. Veuillez d\'abord créer une entreprise.');
+      setError(t('error_no_company'));
       setLoading(false);
       return;
     }
@@ -103,7 +105,7 @@ export default function SmtpSettingsModal({ company, onSettingsSaved }: Props) {
       setOpen(false);
       onSettingsSaved();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Une erreur est survenue');
+      setError(err instanceof Error ? err.message : t('error_message'));
     } finally {
       setLoading(false);
     }
@@ -114,7 +116,7 @@ export default function SmtpSettingsModal({ company, onSettingsSaved }: Props) {
       <Dialog.Trigger asChild>
         <button className="flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors shadow-sm">
           <Mail className="w-4 h-4" />
-          Modifier email
+          {t('button')}
         </button>
       </Dialog.Trigger>
 
@@ -129,7 +131,7 @@ export default function SmtpSettingsModal({ company, onSettingsSaved }: Props) {
                   <Mail className="w-4 h-4" />
                 </div>
                 <Dialog.Title className="text-base font-bold text-gray-900">
-                  Configuration email
+                  {t('title')}
                 </Dialog.Title>
               </div>
               <Dialog.Close className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
@@ -140,7 +142,7 @@ export default function SmtpSettingsModal({ company, onSettingsSaved }: Props) {
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               {/* SMTP Type */}
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="smtp_type" className={labelCls}>Provider SMTP</label>
+                <label htmlFor="smtp_type" className={labelCls}>{t('smtp_type_label')}</label>
                 <select
                   id="smtp_type"
                   name="smtp_type"
@@ -156,7 +158,7 @@ export default function SmtpSettingsModal({ company, onSettingsSaved }: Props) {
 
               {/* SMTP Host */}
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="smtp_host" className={labelCls}>Serveur SMTP</label>
+                <label htmlFor="smtp_host" className={labelCls}>{t('smtp_host_label')}</label>
                 <input
                   id="smtp_host"
                   name="smtp_host"
@@ -166,13 +168,13 @@ export default function SmtpSettingsModal({ company, onSettingsSaved }: Props) {
                   onChange={handleChange}
                   disabled={form.smtp_type !== 'smtp-custom'}
                   className={`${inputCls} disabled:opacity-50 disabled:cursor-not-allowed`}
-                  placeholder="smtp.example.com"
+                  placeholder={t('smtp_host_placeholder')}
                 />
               </div>
 
               {/* SMTP Port */}
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="smtp_port" className={labelCls}>Port</label>
+                <label htmlFor="smtp_port" className={labelCls}>{t('smtp_port_label')}</label>
                 <input
                   id="smtp_port"
                   name="smtp_port"
@@ -182,13 +184,13 @@ export default function SmtpSettingsModal({ company, onSettingsSaved }: Props) {
                   onChange={handleChange}
                   disabled={form.smtp_type !== 'smtp-custom'}
                   className={`${inputCls} disabled:opacity-50 disabled:cursor-not-allowed`}
-                  placeholder="587"
+                  placeholder={t('smtp_port_placeholder')}
                 />
               </div>
 
               {/* SMTP User */}
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="smtp_user" className={labelCls}>Email SMTP</label>
+                <label htmlFor="smtp_user" className={labelCls}>{t('smtp_user_label')}</label>
                 <input
                   id="smtp_user"
                   name="smtp_user"
@@ -197,18 +199,18 @@ export default function SmtpSettingsModal({ company, onSettingsSaved }: Props) {
                   value={form.smtp_user}
                   onChange={handleChange}
                   className={inputCls}
-                  placeholder="votre.email@gmail.com"
+                  placeholder={t('smtp_user_placeholder')}
                 />
               </div>
 
               {/* SMTP Password */}
               <div className="flex flex-col gap-1.5">
                 <div className="flex items-center gap-2">
-                  <label htmlFor="smtp_pass" className={labelCls}>Mot de passe d'application</label>
+                  <label htmlFor="smtp_pass" className={labelCls}>{t('smtp_pass_label')}</label>
                   <div className="group relative">
                     <Info className="w-4 h-4 text-gray-400 cursor-help hover:text-gray-600" />
                     <div className="hidden group-hover:block absolute left-0 top-full mt-1 z-10 w-64 bg-gray-900 text-white text-xs rounded-lg p-2 shadow-lg">
-                      Ce n'est pas le mot de passe de votre boîte mail. Pour Gmail, allez dans Compte Google &gt; Sécurité &gt; Validation en deux étapes &gt; Mots de passe d'application.
+                      {t('smtp_pass_help')}
                     </div>
                   </div>
                 </div>
@@ -226,7 +228,7 @@ export default function SmtpSettingsModal({ company, onSettingsSaved }: Props) {
 
               {/* Email Subject */}
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="email_subject" className={labelCls}>Objet de l'email</label>
+                <label htmlFor="email_subject" className={labelCls}>{t('email_subject_label')}</label>
                 <input
                   id="email_subject"
                   name="email_subject"
@@ -235,13 +237,13 @@ export default function SmtpSettingsModal({ company, onSettingsSaved }: Props) {
                   value={form.email_subject}
                   onChange={handleChange}
                   className={inputCls}
-                  placeholder="Votre facture"
+                  placeholder={t('email_subject_placeholder')}
                 />
               </div>
 
               {/* Email Message */}
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="email_message" className={labelCls}>Corps du message</label>
+                <label htmlFor="email_message" className={labelCls}>{t('email_message_label')}</label>
                 <textarea
                   id="email_message"
                   name="email_message"
@@ -249,7 +251,7 @@ export default function SmtpSettingsModal({ company, onSettingsSaved }: Props) {
                   value={form.email_message}
                   onChange={handleChange}
                   className={`${inputCls} resize-none h-24`}
-                  placeholder="Veuillez trouver en pièce jointe votre facture."
+                  placeholder={t('email_message_placeholder')}
                 />
               </div>
 
@@ -258,7 +260,7 @@ export default function SmtpSettingsModal({ company, onSettingsSaved }: Props) {
               )}
 
               <button type="submit" disabled={loading} className="mt-1 w-full rounded-xl bg-indigo-600 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50 transition-colors">
-                {loading ? 'Enregistrement...' : 'Enregistrer'}
+                {loading ? t('submit_saving') : t('submit')}
               </button>
             </form>
           </div>

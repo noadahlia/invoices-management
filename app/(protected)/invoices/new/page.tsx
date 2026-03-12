@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { ArrowLeft, FileText } from 'lucide-react';
 import { supabase } from '@/src/lib/supabase';
 import { createInvoiceWithItems } from '@/app/actions/invoices';
@@ -22,6 +23,7 @@ function generateInvoiceNumber(): string {
 
 export default function NewInvoicePage() {
   const router = useRouter();
+  const t = useTranslations('invoices_new');
 
   const [clients, setClients]     = useState<Client[]>([]);
   const [services, setServices]   = useState<Service[]>([]);
@@ -92,7 +94,7 @@ export default function NewInvoicePage() {
       });
       router.push('/invoices');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erreur lors de la création de la facture.');
+      setError(err instanceof Error ? err.message : t('error_create_invoice'));
       setSaving(false);
     }
   };
@@ -112,7 +114,7 @@ export default function NewInvoicePage() {
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 shadow-md">
               <FileText className="w-4 h-4 text-white" />
             </div>
-            <h1 className="text-xl font-bold text-gray-900">Nouvelle facture</h1>
+            <h1 className="text-xl font-bold text-gray-900">{t('page_title')}</h1>
           </div>
         </div>
 
@@ -124,8 +126,8 @@ export default function NewInvoicePage() {
             <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
               {services.length === 0 ? (
                 <p className="text-sm text-gray-400 text-center py-8">
-                  Aucun service disponible.{' '}
-                  <Link href="/services" className="text-indigo-600 hover:text-indigo-700 underline underline-offset-4">Ajouter des services</Link>
+                  {t('no_services_available')}{' '}
+                  <Link href="/services" className="text-indigo-600 hover:text-indigo-700 underline underline-offset-4">{t('add_services_link')}</Link>
                 </p>
               ) : (
                 <ServiceCatalog services={services} quantities={quantities} onQuantityChange={handleQuantityChange} />

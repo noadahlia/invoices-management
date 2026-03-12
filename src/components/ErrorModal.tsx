@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Dialog } from 'radix-ui';
 import { X, AlertCircle, CheckCircle, Info } from 'lucide-react';
 
@@ -46,15 +47,17 @@ const CONFIG: Record<MessageType, { icon: React.ReactNode; bgColor: string; grad
   },
 };
 
-const TITLES: Record<MessageType, string> = {
-  error: 'Erreur',
-  success: 'Succès',
-  info: 'Information',
-  warning: 'Attention',
-};
-
 export default function MessageModal({ open, onOpenChange, type = 'info', title, message, actionLabel, onAction }: Props) {
+  const t = useTranslations('components.error_modal');
   const config = CONFIG[type];
+
+  const TITLES: Record<MessageType, string> = {
+    error: t('error_title'),
+    success: t('success_title'),
+    info: t('info_title'),
+    warning: t('warning_title'),
+  };
+
   const displayTitle = title || TITLES[type];
 
   const handleAction = () => {
@@ -90,7 +93,7 @@ export default function MessageModal({ open, onOpenChange, type = 'info', title,
                 onClick={() => onOpenChange(false)}
                 className="flex-1 rounded-xl py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
               >
-                Fermer
+                {t('close_button')}
               </button>
               {onAction && actionLabel && (
                 <button

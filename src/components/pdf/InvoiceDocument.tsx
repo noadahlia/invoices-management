@@ -8,6 +8,28 @@ export interface InvoiceItemData {
   services: { description: string };
 }
 
+export interface PdfLabels {
+  title: string;
+  fromLabel: string;
+  toLabel: string;
+  columnDescription: string;
+  columnQuantity: string;
+  columnUnitPrice: string;
+  columnTotal: string;
+  subtotalLabel: string;
+  totalLabel: string;
+  statusUnpaid: string;
+  statusSent: string;
+  statusPaid: string;
+  defaultCompanyName: string;
+  defaultCompanyAddress: string;
+  defaultCompanyCity: string;
+  defaultCompanyEmail: string;
+  defaultCompanyPhone: string;
+  defaultCompanySiret: string;
+  siretPrefix: string;
+}
+
 export interface InvoiceDocumentProps {
   invoice: {
     invoice_number: string;
@@ -31,14 +53,15 @@ export interface InvoiceDocumentProps {
     telephone: string;
     siret:     string;
   };
+  pdfLabels?: PdfLabels;
 }
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-const STATUS_LABEL: Record<number, string> = {
-  0: 'Non payée',
-  1: 'Envoyée',
-  2: 'Payée',
+const DEFAULT_STATUS_LABEL: Record<number, string> = {
+  0: 'Unpaid',
+  1: 'Sent',
+  2: 'Paid',
 };
 
 const C = {
@@ -215,16 +238,39 @@ const s = StyleSheet.create({
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-const DEFAULT_COMPANY = {
-  name:    'Mon Entreprise',
-  address: '12 Rue de la République',
-  city:    '75001 Paris, France',
-  email:   'contact@monentreprise.fr',
-  phone:   '+33 1 00 00 00 00',
-  siret:   'SIRET : 000 000 000 00000',
+const DEFAULT_LABELS: PdfLabels = {
+  title: 'INVOICE',
+  fromLabel: 'From',
+  toLabel: 'Bill To',
+  columnDescription: 'Description',
+  columnQuantity: 'Qty',
+  columnUnitPrice: 'Unit Price',
+  columnTotal: 'Total',
+  subtotalLabel: 'Subtotal ex. tax',
+  totalLabel: 'Total ex. tax',
+  statusUnpaid: 'Unpaid',
+  statusSent: 'Sent',
+  statusPaid: 'Paid',
+  defaultCompanyName: 'My Company',
+  defaultCompanyAddress: '12 Rue de la République',
+  defaultCompanyCity: '75001 Paris, France',
+  defaultCompanyEmail: 'contact@mycompany.fr',
+  defaultCompanyPhone: '+33 1 00 00 00 00',
+  defaultCompanySiret: 'SIRET : 000 000 000 00000',
+  siretPrefix: 'SIRET : ',
 };
 
-export default function InvoiceDocument({ invoice, items, company }: InvoiceDocumentProps) {
+const DEFAULT_COMPANY = {
+  name:    DEFAULT_LABELS.defaultCompanyName,
+  address: DEFAULT_LABELS.defaultCompanyAddress,
+  city:    DEFAULT_LABELS.defaultCompanyCity,
+  email:   DEFAULT_LABELS.defaultCompanyEmail,
+  phone:   DEFAULT_LABELS.defaultCompanyPhone,
+  siret:   DEFAULT_LABELS.defaultCompanySiret,
+};
+
+export default function InvoiceDocument({ invoice, items, company, pdfLabels }: InvoiceDocumentProps) {
+  const labels = pdfLabels || DEFAULT_LABELS;
   const { clients } = invoice;
   const subtotal = items.reduce((sum, i) => sum + i.quantity * i.unit_price_snapshot, 0);
   const date = new Date(invoice.created_at).toLocaleDateString('fr-FR');
@@ -257,7 +303,7 @@ export default function InvoiceDocument({ invoice, items, company }: InvoiceDocu
             <Text style={s.companyInfo}>{companyData.phone}</Text>
           </View>
           <View style={s.invoiceBadge}>
-            <Text style={s.invoiceTitle}>FACTURE</Text>
+            <Text style={s.invoiceTitle}>{labels.title}</Text>
             <Text style={s.invoiceNumber}>{invoice.invoice_number}</Text>
             <Text style={s.invoiceMeta}>Date : {date}</Text>
           </View>
@@ -268,7 +314,7 @@ export default function InvoiceDocument({ invoice, items, company }: InvoiceDocu
         {/* ── Addresses ── */}
         <View style={s.addresses}>
           <View style={s.addressBox}>
-            <Text style={s.addressLabel}>De</Text>
+            <Text style={s.addressLabel}>{labels.fromLabel}</Text>
             <Text style={s.addressName}>{companyData.name}</Text>
             <Text style={s.addressLine}>{companyData.address}</Text>
             <Text style={s.addressLine}>{companyData.city}</Text>
@@ -277,7 +323,7 @@ export default function InvoiceDocument({ invoice, items, company }: InvoiceDocu
           </View>
 
           <View style={s.addressBox}>
-            <Text style={s.addressLabel}>Facturer à</Text>
+            <Text style={s.addressLabel}>{labels.toLabel}</Text>
             <Text style={s.addressName}>{clients.prenom} {clients.nom}</Text>
             <Text style={s.addressLine}>{clients.email}</Text>
             <Text style={s.addressLine}>{clients.telephone}</Text>
@@ -289,10 +335,10 @@ export default function InvoiceDocument({ invoice, items, company }: InvoiceDocu
         <View style={s.table}>
           {/* Header */}
           <View style={s.tableHeader}>
-            <View style={s.colDescription}><Text style={s.thText}>Description</Text></View>
-            <View style={s.colQty}><Text style={s.thText}>Qté</Text></View>
-            <View style={s.colUnit}><Text style={s.thText}>Prix unit.</Text></View>
-            <View style={s.colTotal}><Text style={s.thText}>Total</Text></View>
+            <View style={s.colDescription}><Text style={s.thText}>{labels.columnDescription}</Text></View>
+            <View style={s.colQty}><Text style={s.thText}>{labels.columnQuantity}</Text></View>
+            <View style={s.colUnit}><Text style={s.thText}>{labels.columnUnitPrice}</Text></View>
+            <View style={s.colTotal}><Text style={s.thText}>{labels.columnTotal}</Text></View>
           </View>
 
           {/* Rows */}
@@ -320,12 +366,12 @@ export default function InvoiceDocument({ invoice, items, company }: InvoiceDocu
         <View style={s.totalSection}>
           <View style={s.totalBox}>
             <View style={s.totalRow}>
-              <Text style={s.totalLabel}>Sous-total HT</Text>
+              <Text style={s.totalLabel}>{labels.subtotalLabel}</Text>
               <Text style={s.totalValue}>{subtotal.toFixed(2)} €</Text>
             </View>
             <View style={s.totalDivider} />
             <View style={s.totalRow}>
-              <Text style={s.grandTotalLabel}>Total HT</Text>
+              <Text style={s.grandTotalLabel}>{labels.totalLabel}</Text>
               <Text style={s.grandTotalValue}>{subtotal.toFixed(2)} €</Text>
             </View>
           </View>

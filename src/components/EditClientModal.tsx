@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Dialog } from 'radix-ui';
 import { X, UserCog } from 'lucide-react';
 import { updateClient } from '@/app/actions/clients';
@@ -14,20 +15,21 @@ interface Props {
   onOpenChange: (open: boolean) => void;
 }
 
-const FIELDS = [
-  { name: 'nom',       label: 'Nom',       type: 'text'  },
-  { name: 'prenom',    label: 'Prénom',    type: 'text'  },
-  { name: 'email',     label: 'Email',     type: 'email' },
-  { name: 'telephone', label: 'Téléphone', type: 'tel'   },
-  { name: 'adresse',   label: 'Adresse',   type: 'text'  },
-] as const;
-
-type FormState = Record<typeof FIELDS[number]['name'], string>;
-
 const inputCls = "w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-indigo-400 focus:bg-white focus:outline-none focus:ring-3 focus:ring-indigo-500/10 transition-all";
 const labelCls = "text-xs font-semibold text-gray-500 uppercase tracking-wider";
 
 export default function EditClientModal({ client, onClientUpdated, open, onOpenChange }: Props) {
+  const t = useTranslations('components.edit_client_modal');
+
+  const FIELDS = [
+    { name: 'nom',       label: t('field_last_name'),  type: 'text'  },
+    { name: 'prenom',    label: t('field_first_name'), type: 'text'  },
+    { name: 'email',     label: t('field_email'),      type: 'email' },
+    { name: 'telephone', label: t('field_phone'),      type: 'tel'   },
+    { name: 'adresse',   label: t('field_address'),    type: 'text'  },
+  ] as const;
+
+  type FormState = Record<typeof FIELDS[number]['name'], string>;
   const [loading, setLoading] = useState(false);
   const [form, setForm]       = useState<FormState>({
     nom: client.nom,
@@ -47,10 +49,10 @@ export default function EditClientModal({ client, onClientUpdated, open, onOpenC
     try {
       await updateClient(client.id, form);
       onOpenChange(false);
-      setMessage({ type: 'success', text: 'Client modifié avec succès' });
+      setMessage({ type: 'success', text: t('success_message') });
       onClientUpdated();
     } catch (err) {
-      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Une erreur est survenue' });
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : t('error_message') });
     } finally {
       setLoading(false);
     }
@@ -69,7 +71,7 @@ export default function EditClientModal({ client, onClientUpdated, open, onOpenC
                 <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
                   <UserCog className="w-4 h-4" />
                 </div>
-                <Dialog.Title className="text-base font-bold text-gray-900">Éditer le client</Dialog.Title>
+                <Dialog.Title className="text-base font-bold text-gray-900">{t('title')}</Dialog.Title>
               </div>
               <Dialog.Close className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
                 <X className="w-4 h-4" />
@@ -93,7 +95,7 @@ export default function EditClientModal({ client, onClientUpdated, open, onOpenC
               ))}
 
               <button type="submit" disabled={loading} className="mt-1 w-full rounded-xl bg-indigo-600 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50 transition-colors">
-                {loading ? 'Enregistrement...' : 'Mettre à jour'}
+                {loading ? t('submit_saving') : t('submit')}
               </button>
             </form>
           </div>

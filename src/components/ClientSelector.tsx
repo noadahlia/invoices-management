@@ -1,3 +1,6 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
 import { ChevronDown } from 'lucide-react';
 import { Client } from '@/src/types';
 
@@ -8,10 +11,12 @@ interface Props {
 }
 
 export default function ClientSelector({ clients, value, onChange }: Props) {
+  const t = useTranslations('components.client_selector');
+
   return (
     <div className="flex flex-col gap-2">
       <label htmlFor="client" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-        Client
+        {t('label')}
       </label>
       <div className="relative">
         <select
@@ -21,7 +26,7 @@ export default function ClientSelector({ clients, value, onChange }: Props) {
           required
           className="w-full appearance-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 pr-10 text-sm text-gray-900 focus:border-indigo-400 focus:bg-white focus:outline-none focus:ring-3 focus:ring-indigo-500/10 transition-all cursor-pointer"
         >
-          <option value="" disabled className="text-gray-400">Sélectionner un client...</option>
+          <option value="" disabled className="text-gray-400">{t('placeholder')}</option>
           {clients.map(c => (
             <option key={c.id} value={c.id}>{c.nom} {c.prenom}</option>
           ))}

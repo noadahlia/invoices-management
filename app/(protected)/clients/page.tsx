@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { ArrowLeft, Users, MoreHorizontal, Pencil } from 'lucide-react';
 import { DropdownMenu } from 'radix-ui';
 import { getClients } from '@/app/actions/clients';
@@ -10,15 +11,16 @@ import AddClientModal from '@/src/components/AddClientModal';
 import EditClientModal from '@/src/components/EditClientModal';
 import MessageModal, { type MessageType } from '@/src/components/ErrorModal';
 
-const COLUMNS: { key: keyof Client; label: string }[] = [
-  { key: 'nom',       label: 'Nom'       },
-  { key: 'prenom',    label: 'Prénom'    },
-  { key: 'email',     label: 'Email'     },
-  { key: 'telephone', label: 'Téléphone' },
-  { key: 'adresse',   label: 'Adresse'   },
-];
-
 export default function ClientsPage() {
+  const t = useTranslations('clients');
+
+  const COLUMNS: { key: keyof Client; label: string }[] = [
+    { key: 'nom',       label: t('column_last_name') },
+    { key: 'prenom',    label: t('column_first_name') },
+    { key: 'email',     label: t('column_email') },
+    { key: 'telephone', label: t('column_phone') },
+    { key: 'adresse',   label: t('column_address') },
+  ];
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -65,9 +67,9 @@ export default function ClientsPage() {
                 <Users className="w-4 h-4 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Clients</h1>
+                <h1 className="text-xl font-bold text-gray-900">{t('page_title')}</h1>
                 <p className="text-xs text-gray-400">
-                  {clients.length} enregistré{clients.length !== 1 ? 's' : ''}
+                  {clients.length} {t('registered_count')}
                 </p>
               </div>
             </div>
@@ -79,15 +81,15 @@ export default function ClientsPage() {
         <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
           {loading ? (
             <div className="flex items-center justify-center py-20 text-gray-400 text-sm">
-              Chargement...
+              {t('loading')}
             </div>
           ) : clients.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 gap-3">
               <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-100">
                 <Users className="w-6 h-6 text-gray-300" />
               </div>
-              <p className="text-sm font-medium text-gray-500">Aucun client enregistré</p>
-              <p className="text-xs text-gray-400">Cliquez sur &quot;Ajouter un client&quot; pour commencer.</p>
+              <p className="text-sm font-medium text-gray-500">{t('no_clients')}</p>
+              <p className="text-xs text-gray-400">{t('no_clients_help')}</p>
             </div>
           ) : (
             <table className="w-full text-sm">
@@ -127,7 +129,7 @@ export default function ClientsPage() {
                               className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 outline-none transition-colors"
                             >
                               <Pencil className="w-3.5 h-3.5 text-gray-400" />
-                              Modifier
+                              {t('edit_action')}
                             </DropdownMenu.Item>
                           </DropdownMenu.Content>
                         </DropdownMenu.Portal>

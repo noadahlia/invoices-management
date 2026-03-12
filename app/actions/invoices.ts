@@ -1,15 +1,17 @@
 'use server';
 
+import { getTranslations } from 'next-intl/server';
 import { getSupabaseServerClient } from '@/src/lib/server-auth';
 import type { Invoice } from '@/src/types';
 
 export async function getInvoices() {
+  const t = await getTranslations('server_actions.invoices');
   try {
     const supabase = await getSupabaseServerClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      throw new Error('Non authentifié');
+      throw new Error(t('not_authenticated'));
     }
 
     const { data, error } = await supabase
@@ -19,22 +21,23 @@ export async function getInvoices() {
       .order('created_at', { ascending: false });
 
     if (error) {
-      throw new Error(`Erreur: ${error.message}`);
+      throw new Error(`${t('error_prefix')} ${error.message}`);
     }
 
     return data;
   } catch (err) {
-    throw new Error(err instanceof Error ? err.message : 'Une erreur est survenue');
+    throw new Error(err instanceof Error ? err.message : t('generic_error'));
   }
 }
 
 export async function createInvoice(data: Omit<Invoice, 'id' | 'created_at'>) {
+  const t = await getTranslations('server_actions.invoices');
   try {
     const supabase = await getSupabaseServerClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      throw new Error('Non authentifié');
+      throw new Error(t('not_authenticated'));
     }
 
     const { error, data: invoice } = await supabase
@@ -44,22 +47,23 @@ export async function createInvoice(data: Omit<Invoice, 'id' | 'created_at'>) {
       .single();
 
     if (error) {
-      throw new Error(`Erreur: ${error.message}`);
+      throw new Error(`${t('error_prefix')} ${error.message}`);
     }
 
     return invoice;
   } catch (err) {
-    throw new Error(err instanceof Error ? err.message : 'Une erreur est survenue');
+    throw new Error(err instanceof Error ? err.message : t('generic_error'));
   }
 }
 
 export async function updateInvoice(id: string, data: Partial<Invoice>) {
+  const t = await getTranslations('server_actions.invoices');
   try {
     const supabase = await getSupabaseServerClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      throw new Error('Non authentifié');
+      throw new Error(t('not_authenticated'));
     }
 
     const { error, data: invoice } = await supabase
@@ -71,22 +75,23 @@ export async function updateInvoice(id: string, data: Partial<Invoice>) {
       .single();
 
     if (error) {
-      throw new Error(`Erreur: ${error.message}`);
+      throw new Error(`${t('error_prefix')} ${error.message}`);
     }
 
     return invoice;
   } catch (err) {
-    throw new Error(err instanceof Error ? err.message : 'Une erreur est survenue');
+    throw new Error(err instanceof Error ? err.message : t('generic_error'));
   }
 }
 
 export async function deleteInvoice(id: string) {
+  const t = await getTranslations('server_actions.invoices');
   try {
     const supabase = await getSupabaseServerClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      throw new Error('Non authentifié');
+      throw new Error(t('not_authenticated'));
     }
 
     const { error } = await supabase
@@ -96,20 +101,21 @@ export async function deleteInvoice(id: string) {
       .eq('user_id', user.id);
 
     if (error) {
-      throw new Error(`Erreur: ${error.message}`);
+      throw new Error(`${t('error_prefix')} ${error.message}`);
     }
   } catch (err) {
-    throw new Error(err instanceof Error ? err.message : 'Une erreur est survenue');
+    throw new Error(err instanceof Error ? err.message : t('generic_error'));
   }
 }
 
 export async function getInvoiceById(id: string) {
+  const t = await getTranslations('server_actions.invoices');
   try {
     const supabase = await getSupabaseServerClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      throw new Error('Non authentifié');
+      throw new Error(t('not_authenticated'));
     }
 
     const { data, error } = await supabase
@@ -120,12 +126,12 @@ export async function getInvoiceById(id: string) {
       .single();
 
     if (error) {
-      throw new Error(`Erreur: ${error.message}`);
+      throw new Error(`${t('error_prefix')} ${error.message}`);
     }
 
     return data;
   } catch (err) {
-    throw new Error(err instanceof Error ? err.message : 'Une erreur est survenue');
+    throw new Error(err instanceof Error ? err.message : t('generic_error'));
   }
 }
 
@@ -136,12 +142,13 @@ export async function createInvoiceWithItems(data: {
   status: number;
   items: Array<{ service_id: string; quantity: number; unit_price_snapshot: number }>;
 }) {
+  const t = await getTranslations('server_actions.invoices');
   try {
     const supabase = await getSupabaseServerClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      throw new Error('Non authentifié');
+      throw new Error(t('not_authenticated'));
     }
 
     // Create invoice with user_id
@@ -158,7 +165,7 @@ export async function createInvoiceWithItems(data: {
       .single();
 
     if (invoiceError || !invoice) {
-      throw new Error(invoiceError?.message ?? 'Erreur lors de la création de la facture');
+      throw new Error(invoiceError?.message ?? t('create_error'));
     }
 
     // Create invoice items
@@ -180,6 +187,6 @@ export async function createInvoiceWithItems(data: {
 
     return invoice;
   } catch (err) {
-    throw new Error(err instanceof Error ? err.message : 'Une erreur est survenue');
+    throw new Error(err instanceof Error ? err.message : t('generic_error'));
   }
 }

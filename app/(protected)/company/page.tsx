@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { ArrowLeft, Building2, Mail } from 'lucide-react';
 import { getCompany } from '@/app/actions/company';
 import type { Company } from '@/src/types';
@@ -9,6 +10,7 @@ import EditCompanyModal from '@/src/components/EditCompanyModal';
 import SmtpSettingsModal from '@/src/components/SmtpSettingsModal';
 
 export default function CompanyPage() {
+  const t = useTranslations('company');
   const [company, setCompany] = useState<Company | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -44,9 +46,9 @@ export default function CompanyPage() {
                 <Building2 className="w-4 h-4 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Entreprise</h1>
+                <h1 className="text-xl font-bold text-gray-900">{t('page_title')}</h1>
                 <p className="text-xs text-gray-400">
-                  {company ? 'Informations enregistrées' : 'Aucune entreprise enregistrée'}
+                  {company ? t('company_info') : t('no_company')}
                 </p>
               </div>
             </div>
@@ -58,31 +60,31 @@ export default function CompanyPage() {
         <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
           {loading ? (
             <div className="flex items-center justify-center py-20 text-gray-400 text-sm">
-              Chargement...
+              {t('loading')}
             </div>
           ) : !company ? (
             <div className="flex flex-col items-center justify-center py-20 gap-3">
               <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-100">
                 <Building2 className="w-6 h-6 text-gray-300" />
               </div>
-              <p className="text-sm font-medium text-gray-500">Aucune entreprise enregistrée</p>
-              <p className="text-xs text-gray-400">Cliquez sur &quot;Ajouter entreprise&quot; pour commencer.</p>
+              <p className="text-sm font-medium text-gray-500">{t('empty_state')}</p>
+              <p className="text-xs text-gray-400">{t('empty_state_help')}</p>
             </div>
           ) : (
             <div className="p-8 space-y-6">
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Nom</p>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">{t('field_name')}</p>
                   <p className="text-base font-semibold text-gray-900">{company.nom}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">SIRET</p>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">{t('field_siret')}</p>
                   <p className="text-base font-semibold text-gray-900">{company.siret}</p>
                 </div>
               </div>
 
               <div className="border-t border-gray-100 pt-6">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Adresse</p>
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{t('field_address')}</p>
                 <div className="space-y-1 text-sm text-gray-600">
                   <p>{company.adresse}</p>
                   <p>{company.ville}</p>
@@ -91,11 +93,11 @@ export default function CompanyPage() {
 
               <div className="border-t border-gray-100 pt-6 grid grid-cols-2 gap-6">
                 <div>
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Email</p>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">{t('field_email')}</p>
                   <p className="text-sm text-gray-600">{company.email}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Téléphone</p>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">{t('field_phone')}</p>
                   <p className="text-sm text-gray-600">{company.telephone}</p>
                 </div>
               </div>
@@ -112,7 +114,7 @@ export default function CompanyPage() {
                   <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
                     <Mail className="w-4 h-4" />
                   </div>
-                  <h2 className="text-base font-bold text-gray-900">Configuration email</h2>
+                  <h2 className="text-base font-bold text-gray-900">{t('email_config_title')}</h2>
                 </div>
                 <SmtpSettingsModal company={company} onSettingsSaved={fetchCompany} />
               </div>
@@ -134,14 +136,14 @@ export default function CompanyPage() {
                     <span className="font-medium text-gray-900">{company.smtp_host}:{company.smtp_port}</span>
                   </div>
                   <div className="border-t border-gray-100 pt-3 mt-3">
-                    <p className="text-xs text-gray-500 mb-1">Objet des emails:</p>
+                    <p className="text-xs text-gray-500 mb-1">{t('email_subject_label')}</p>
                     <p className="text-sm text-gray-700">{company.email_subject}</p>
                   </div>
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-8 gap-3">
-                  <p className="text-sm text-gray-500">Aucune configuration email</p>
-                  <p className="text-xs text-gray-400">Cliquez sur &quot;Modifier email&quot; pour configurer l'envoi de factures par email.</p>
+                  <p className="text-sm text-gray-500">{t('email_config_empty')}</p>
+                  <p className="text-xs text-gray-400">{t('email_config_help')}</p>
                 </div>
               )}
             </div>

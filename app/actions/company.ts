@@ -1,15 +1,17 @@
 'use server';
 
+import { getTranslations } from 'next-intl/server';
 import { getSupabaseServerClient } from '@/src/lib/server-auth';
 import type { Company } from '@/src/types';
 
 export async function getCompany() {
+  const t = await getTranslations('server_actions.company');
   try {
     const supabase = await getSupabaseServerClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      throw new Error('Non authentifié');
+      throw new Error(t('not_authenticated'));
     }
 
     const { data, error } = await supabase
@@ -20,22 +22,23 @@ export async function getCompany() {
       .single();
 
     if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
-      throw new Error(`Erreur: ${error.message}`);
+      throw new Error(`${t('error_prefix')} ${error.message}`);
     }
 
     return data || null;
   } catch (err) {
-    throw new Error(err instanceof Error ? err.message : 'Une erreur est survenue');
+    throw new Error(err instanceof Error ? err.message : t('generic_error'));
   }
 }
 
 export async function updateCompany(data: Partial<Company>) {
+  const t = await getTranslations('server_actions.company');
   try {
     const supabase = await getSupabaseServerClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      throw new Error('Non authentifié');
+      throw new Error(t('not_authenticated'));
     }
 
     // Vérifier si une entreprise existe pour cet utilisateur
@@ -72,11 +75,11 @@ export async function updateCompany(data: Partial<Company>) {
     }
 
     if (error) {
-      throw new Error(`Erreur: ${error.message}`);
+      throw new Error(`${t('error_prefix')} ${error.message}`);
     }
 
     return company;
   } catch (err) {
-    throw new Error(err instanceof Error ? err.message : 'Une erreur est survenue');
+    throw new Error(err instanceof Error ? err.message : t('generic_error'));
   }
 }
